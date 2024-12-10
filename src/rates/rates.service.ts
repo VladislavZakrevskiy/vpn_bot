@@ -10,6 +10,10 @@ export class RateService {
     return this.prisma.rate.findMany();
   }
 
+  async getByQuery(where: Prisma.RateWhereInput) {
+    return this.prisma.rate.findFirst({ where });
+  }
+
   async addRate(data: Prisma.RateCreateInput): Promise<Rate> {
     return this.prisma.rate.create({
       data,

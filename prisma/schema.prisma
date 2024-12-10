@@ -7,12 +7,22 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Settings {
+  id               String @id @unique @default(uuid()) @db.Uuid
+  admin_proxy_path String
+  user_proxy_path  String
+}
+
 model User {
   id         String     @id @unique @default(uuid()) @db.Uuid
   tg_id      String     @unique
-  username   String
+  username   String?
   first_name String
-  last_name  String
+  last_name  String?
+  role       Role       @default(USER)
+  vpn_uuid   String
+  is_active  Boolean
+  was_trial Boolean @default(false)
   purchases  Purchase[]
 }
 
@@ -26,14 +36,18 @@ model Purchase {
   purchase_date DateTime
   amount        Int
   currency      Currency
-  active Boolean
+  active        Boolean
 }
 
 model Rate {
   id          String     @id @unique @default(uuid()) @db.Uuid
   name        String
   description String
-  expiresIn   Int
+  price       Int
+  GB_limit    Int
+  max_devices Int
+  MB_speed    Int
+  expiresIn   Int // Days
   purchases   Purchase[]
 }
 
@@ -41,4 +55,9 @@ enum Currency {
   RUB
   STARS
   CRYPTO
+}
+
+enum Role {
+  ADMIN
+  USER
 }

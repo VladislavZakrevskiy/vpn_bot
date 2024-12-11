@@ -99,11 +99,12 @@ export class CryptoPaymentService {
       console.log(requestDate, invoice);
     };
 
-    client.createServer(
+    await client.createServer(
       {
         http: true,
       },
-      '/secret-webhooks-path',
+      '/' + process.env.CRYPTO_PAYMENT_TOKEN,
     );
+    client.on('paid', onPaid);
   }
 }

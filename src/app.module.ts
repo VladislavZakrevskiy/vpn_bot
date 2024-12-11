@@ -14,7 +14,7 @@ import { session } from 'telegraf';
     BotModule,
     PrismaModule,
     HttpModule.register({
-      baseURL: 'https://vpn.workit.tech',
+      baseURL: process.env.VPN_URL,
       global: true,
       headers: { 'Hiddify-API-Key': process.env.PROXY_API_TOKEN },
     }),

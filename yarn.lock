@@ -1966,6 +1966,11 @@ cross-spawn@^7.0.0, cross-spawn@^7.0.2, cross-spawn@^7.0.3:
     shebang-command "^2.0.0"
     which "^2.0.1"
 
+crypto-bot-api@^0.3.3:
+  version "0.3.3"
+  resolved "https://registry.yarnpkg.com/crypto-bot-api/-/crypto-bot-api-0.3.3.tgz#8f11f62ac76ab038d8da188c0b8a018f1248fc9e"
+  integrity sha512-EKyY6eMujJ2rIoNezNBdChW6Fwqv5xepYpH6tlqX+9ZoeL0b/rQP7osJw6MiAoe3bO9XznfS7TB7/mrZJCGhcg==
+
 dayjs@^1.11.13:
   version "1.11.13"
   resolved "https://registry.yarnpkg.com/dayjs/-/dayjs-1.11.13.tgz#92430b0139055c3ebb60150aa13e860a4b5a366c"

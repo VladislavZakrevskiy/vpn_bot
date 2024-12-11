@@ -1,4 +1,4 @@
-import { Ctx, Start, Update } from 'nestjs-telegraf';
+import { Ctx, Hears, Start, Update } from 'nestjs-telegraf';
 import { getStartText } from './texts/getStartText';
 import { TgUser } from './decorators/TgUser';
 import { TelegramUser } from './types/TelegramUser';
@@ -6,6 +6,8 @@ import { UserService } from 'src/users/users.service';
 import { VpnAdminService } from 'src/vpn/services/vpn.admin.service';
 import { RateUpdate } from '../rate/rate.update';
 import { SessionSceneContext } from './types/Context';
+import { Markup } from 'telegraf';
+import { getProfile } from './texts/getProfile';
 
 @Update()
 export class BotCoreUpdate {
@@ -26,15 +28,31 @@ export class BotCoreUpdate {
         name: [user.first_name, user.last_name, user.username].join(' '),
       });
       await this.userService.createUser({
-        first_name: user.first_name,
-        last_name: user.last_name,
         tg_id: user.id.toString(),
-        username: user.username,
         is_active: false,
         vpn_uuid: vpnBot.uuid,
       });
     }
-    await ctx.replyWithMarkdownV2(getStartText());
+    await ctx.replyWithMarkdownV2(
+      getStartText(),
+      Markup.keyboard([
+        [Markup.button.callback('🛒 Список тарифов', 'rate_list')],
+        [Markup.button.callback('👤 Профиль', 'profile')],
+      ]).resize(),
+    );
     await this.rateUpdate.handleRateList(ctx);
+  }
+
+  @Hears('🛒 Список тарифов')
+  async sendRateList(@Ctx() ctx: SessionSceneContext) {
+    await this.rateUpdate.handleRateList(ctx);
+  }
+
+  @Hears('👤 Профиль')
+  async sendProfile(@Ctx() ctx: SessionSceneContext) {
+    const user = await this.userService.getUserByQuery({
+      tg_id: ctx.from.id.toString(),
+    });
+    await ctx.replyWithMarkdownV2(getProfile(user));
   }
 }

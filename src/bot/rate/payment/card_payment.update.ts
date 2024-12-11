@@ -84,6 +84,8 @@ export class CardPaymentService {
       enable: true,
       package_days: rate.expiresIn,
     });
+    await this.userService.updateUser({ id: user.id }, { is_active: true });
+
     const configs = await this.vpnUserService.getAllConfigs(user.vpn_uuid);
     const autoConfig = configs.find(({ name }) => name === 'Auto');
 

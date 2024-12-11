@@ -11,18 +11,17 @@ model Settings {
   id               String @id @unique @default(uuid()) @db.Uuid
   admin_proxy_path String
   user_proxy_path  String
+  crypto_types String[] 
 }
 
 model User {
   id         String     @id @unique @default(uuid()) @db.Uuid
   tg_id      String     @unique
-  username   String?
-  first_name String
-  last_name  String?
   role       Role       @default(USER)
   vpn_uuid   String
   is_active  Boolean
   was_trial Boolean @default(false)
+  vpn_token String?  
   purchases  Purchase[]
 }
 
@@ -44,10 +43,11 @@ model Rate {
   name        String
   description String
   price       Int
+  price_XTR Int 
   GB_limit    Int
   max_devices Int
   MB_speed    Int
-  expiresIn   Int // Days
+  expiresIn   Int 
   purchases   Purchase[]
 }
 

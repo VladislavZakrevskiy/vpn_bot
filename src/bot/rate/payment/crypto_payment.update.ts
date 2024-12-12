@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import { Action, Ctx, Update } from 'nestjs-telegraf';
 import { getCryptoPaymentText } from 'src/bot/core/texts/getCryptoPaymentText';
 import { SessionSceneContext } from 'src/bot/core/types/Context';
@@ -7,8 +8,9 @@ import {
   CallbackQuery,
   InlineKeyboardButton,
 } from 'telegraf/typings/core/types/typegram';
+import { WalletPaySDK } from 'wallet-pay-sdk';
+import { ECurrencyCode } from 'wallet-pay-sdk/lib/src/types';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const CryptoBotAPI = require('crypto-bot-api');
 
 @Update()
 export class CryptoPaymentService {
@@ -56,7 +58,7 @@ export class CryptoPaymentService {
     );
   }
 
-  @Action(/^(BTC|ETH|TON|BNB|BUSD|USDC|USDT)_(.+)$/)
+  @Action(/^(BTC|EUR|RUB|TON|BUSD|USD|USDT)_(.+)$/)
   async sendCryptoInvoice(@Ctx() ctx: SessionSceneContext) {
     const currency = (
       ctx.callbackQuery as CallbackQuery & { data: string }
@@ -65,46 +67,41 @@ export class CryptoPaymentService {
       ctx.callbackQuery as CallbackQuery & { data: string }
     ).data.split('_')[1];
     const rate = await this.rateService.getByQuery({ id: rate_id });
-    const client = new CryptoBotAPI(process.env.CRYPTO_PAYMENT_TOKEN);
-    const invoice = await client.createInvoice({
-      amount: rate.price,
-      currencyType: CryptoBotAPI.CurrencyType.Fiat,
-      fiat: 'RUB',
-      description: `Оплата тарифа ${rate.name} - ${rate.description}`,
-      isAllowAnonymous: false,
-      acceptedAssets: [currency],
+    const wp = new WalletPaySDK({
+      apiKey: process.env.CRYPTO_PAYMENT_TOKEN,
+      timeoutSeconds: 60 * 10,
     });
-    const currencyUSD = await client.getExchangeRate('RUB', 'USD');
-    const currencyRate = await client.getExchangeRate(currency, 'USD');
-
-    await ctx.deleteMessage();
-    await ctx.replyWithMarkdownV2(
-      getCryptoPaymentText((rate.price * currencyUSD) / currencyRate, currency),
-      {
-        reply_markup: {
-          inline_keyboard: [
-            [{ url: invoice.botPayUrl, text: '✅ Перейти к оплате' }],
-            [
-              {
-                callback_data: `crypto_${rate.id}`,
-                text: '🔙 Назад',
-              },
-            ],
-          ],
-        },
+    const newOrder = {
+      amount: {
+        currencyCode: currency as ECurrencyCode,
+        amount: '10.67',
       },
-    );
-
-    const onPaid = (invoice, requestDate) => {
-      console.log(requestDate, invoice);
+      description: 'My first order',
+      // returnUrl: 'https://example.com',
+      // failReturnUrl: 'https://example.com',
+      externalId: randomUUID(),
+      customerTelegramUserId: ctx.from.id,
     };
 
-    await client.createServer(
-      {
-        http: true,
-      },
-      '/' + process.env.CRYPTO_PAYMENT_TOKEN,
-    );
-    client.on('paid', onPaid);
+    const result = await wp.createOrder(newOrder);
+    console.log(result);
+
+    // await ctx.deleteMessage();
+    // await ctx.replyWithMarkdownV2(
+    //   getCryptoPaymentText((rate.price * currencyUSD) / currencyRate, currency),
+    //   {
+    //     reply_markup: {
+    //       inline_keyboard: [
+    //         [{ url: invoice.botPayUrl, text: '✅ Перейти к оплате' }],
+    //         [
+    //           {
+    //             callback_data: `crypto_${rate.id}`,
+    //             text: '🔙 Назад',
+    //           },
+    //         ],
+    //       ],
+    //     },
+    //   },
+    // );
   }
 }

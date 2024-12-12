@@ -4,6 +4,7 @@ import { BotModule } from './bot/bot.module';
 import { PrismaModule } from './db/prisma.module';
 import { HttpModule } from '@nestjs/axios';
 import { session } from 'telegraf';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { session } from 'telegraf';
       token: process.env.TELEGRAM_BOT_TOKEN,
       middlewares: [session()],
     }),
+    ScheduleModule.forRoot(),
     BotModule,
     PrismaModule,
     HttpModule.register({

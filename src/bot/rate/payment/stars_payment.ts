@@ -71,22 +71,28 @@ export class StarsPaymentService {
     const rate_id =
       ctx.message.successful_payment.invoice_payload.split('_')[1];
     const rate = await this.rateService.getByQuery({ id: rate_id });
-    await this.purchaseService.createPurchase({
-      active: true,
-      amount: rate.price,
-      currency: Currency.RUB,
-      purchase_date: dayjs().toISOString(),
-      rate: { connect: { id: rate.id } },
-      user: { connect: { id: user.id } },
-    });
+    const vpnUser = await this.vpnAdminService.getUser(user.vpn_uuid);
+    console.log(
+      vpnUser.usage_limit_GB + rate.GB_limit,
+      vpnUser.usage_limit_GB + rate.GB_limit,
+    );
     await this.vpnAdminService.updateUser(user.vpn_uuid, {
-      usage_limit_GB: rate.GB_limit,
+      usage_limit_GB: vpnUser.usage_limit_GB + rate.GB_limit,
       enable: true,
-      package_days: rate.expiresIn,
+      package_days: vpnUser.package_days + rate.expiresIn,
     });
     await this.userService.updateUser({ id: user.id }, { is_active: true });
     const configs = await this.vpnUserService.getAllConfigs(user.vpn_uuid);
     const autoConfig = configs.find(({ name }) => name === 'Auto');
+    await this.purchaseService.createPurchase({
+      active: true,
+      amount: rate.price,
+      vpn_token: autoConfig.link,
+      currency: Currency.RUB,
+      purchase_date: dayjs().add(rate.expiresIn, 'days').toISOString(),
+      rate: { connect: { id: rate.id } },
+      user: { connect: { id: user.id } },
+    });
 
     await ctx.replyWithMarkdownV2(getSuccessfulPayload(autoConfig.link));
   }

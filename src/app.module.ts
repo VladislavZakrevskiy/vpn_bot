@@ -23,4 +23,8 @@ import { ScheduleModule } from '@nestjs/schedule';
   ],
   providers: [],
 })
-export class AppModule {}
+export class AppModule {
+  constructor() {
+    console.log('app');
+  }
+}

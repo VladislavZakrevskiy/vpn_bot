@@ -7,7 +7,7 @@ import {
   InfoAPI,
   MTProxiesAPI,
   ShortAPI,
-} from '../types/Apis';
+} from '../types/APIs';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()

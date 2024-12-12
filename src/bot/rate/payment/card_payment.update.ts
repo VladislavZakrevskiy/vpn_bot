@@ -94,6 +94,6 @@ export class CardPaymentService {
       user: { connect: { id: user.id } },
     });
 
-    await ctx.replyWithMarkdownV2(getSuccessfulPayload(autoConfig.link));
+    await ctx.replyWithHTML(getSuccessfulPayload(autoConfig.link));
   }
 }

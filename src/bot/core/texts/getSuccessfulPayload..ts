@@ -1,31 +1,29 @@
-import { escapeMarkdown } from '../helpers/escapeMarkdown';
-
-export const getSuccessfulPayload = (link: string) =>
-  escapeMarkdown(`*Спасибо за покупку CareVPN! 🌐*
+export const getSuccessfulPayload = (
+  link: string,
+) => `<b>Спасибо за покупку CareVPN!</b> 🌐
 
 Теперь вы можете безопасно подключаться к интернету и защищать свои данные. Для начала работы выполните следующие шаги:
 
-*1. Скачайте и установите приложение Hiddify на ваше устройство:*
+<b>1. Скачайте и установите приложение Hiddify на ваше устройство:</b>
 
-📱 [iOS](https://apps.apple.com/us/app/hiddify-proxy-vpn/id6596777532?platform=iphone)
-🤖 [Android](https://play.google.com/store/apps/details?id=app.hiddify.com&hl=ru)
-💻 [MacOS](https://apps.apple.com/us/app/hiddify-proxy-vpn/id6596777532?platform=iphone)
-🖥️ [Windows](https://github.com/hiddify/hiddify-app/releases/latest/download/Hiddify-Windows-Setup-x64.Msix)
-💾 [Linux](https://github.com/hiddify/hiddify-app/releases/latest/download/Hiddify-Linux-x64.AppImage)
+📱 <a href="https://apps.apple.com/us/app/hiddify-proxy-vpn/id6596777532?platform=iphone">iOS</a>
+🤖 <a href="https://play.google.com/store/apps/details?id=app.hiddify.com&hl=ru">Android</a>
+💻 <a href="https://apps.apple.com/us/app/hiddify-proxy-vpn/id6596777532?platform=iphone">MacOS</a>
+🖥️ <a href="https://github.com/hiddify/hiddify-app/releases/latest/download/Hiddify-Windows-Setup-x64.Msix">Windows</a>
+💾 <a href="https://github.com/hiddify/hiddify-app/releases/latest/download/Hiddify-Linux-x64.AppImage">Linux</a>
 
-*2. Запустите клиент Hiddify на вашем устройстве.*
+<b>2. Запустите клиент Hiddify на вашем устройстве.</b>
 
-*3. Скопируйте ключ доступа, нажмите на "+" вправом верхнем углу и нажмите "Добавить из буфера обмена".*
+<b>3. Скопируйте ключ доступа, нажмите на "+" вправом верхнем углу и нажмите "Добавить из буфера обмена".</b>
 
-*Ваш ключ доступа:*
+<b>Ваш ключ доступа:</b>
 
-\`\`\`
 ${link}
-\`\`\`
-*Важно:* 
+
+<b>Важно:</b> 
 Убедитесь, что ваше подключение к интернету активно.
 Если возникнут вопросы или проблемы, не стесняйтесь обращаться к нашей поддержке.
 Теперь вы готовы к безопасному серфингу в интернете! 🌍💻
 
-*С уважением,*
-*VPN*`);
+<b>С уважением,</b>
+<b>VPN</b>`;

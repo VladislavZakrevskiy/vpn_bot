@@ -31,6 +31,8 @@ export class BotCoreUpdate {
       const vpnBot = await this.vpnAdminService.createUser({
         lang: user.language_code || 'ru',
         name: [user.first_name, user.last_name, user.username].join(' '),
+        package_days: 0,
+        usage_limit_GB: 0,
       });
       await this.userService.createUser({
         tg_id: user.id.toString(),

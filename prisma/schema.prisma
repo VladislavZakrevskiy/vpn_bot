@@ -12,6 +12,7 @@ model Settings {
   admin_proxy_path String
   user_proxy_path  String
   crypto_types String[] 
+  max_sert Int @default(3)
 }
 
 model User {

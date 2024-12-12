@@ -15,6 +15,7 @@ import { VpnUserService } from 'src/vpn/services/vpn.user.service';
 import { VpnAdminService } from 'src/vpn/services/vpn.admin.service';
 import { getSuccessfulPayload } from '../core/texts/getSuccessfulPayload.';
 import * as dayjs from 'dayjs';
+import { PrismaService } from 'src/db/prisma.service';
 
 @Update()
 @Injectable()
@@ -25,6 +26,7 @@ export class RateUpdate {
     private purchaseService: PurchaseService,
     private vpnUserService: VpnUserService,
     private vpnAdminService: VpnAdminService,
+    private prisma: PrismaService,
     @InjectBot() private bot: Telegraf,
   ) {}
 
@@ -64,13 +66,15 @@ export class RateUpdate {
     const user = await this.userService.getUserWithPurchaseByQuery({
       tg_id: ctx.from.id.toString(),
     });
+    const settings = await this.prisma.settings.findFirst({});
     if (
       user?.purchases &&
-      user?.purchases.filter(({ active }) => active).length >= 3
+      user?.purchases.filter(({ active }) => active).length >=
+        (settings.max_sert || 3)
     ) {
       await ctx.replyWithMarkdownV2(
         escapeMarkdown(
-          `Простите, у вас уже есть 3 активных тарифа! Если вы хотите делиться сертфикатами с ними, пожалуйста, порекомендуйте нас! Это просто, просто пришлите им имя бота @${this.bot.botInfo.username}`,
+          `Простите, у вас уже есть ${settings.max_sert || 3} активных тарифа! Если вы хотите делиться сертфикатами с ними, пожалуйста, порекомендуйте нас! Это просто, просто пришлите им имя бота @${this.bot.botInfo.username}`,
         ),
       );
       return;

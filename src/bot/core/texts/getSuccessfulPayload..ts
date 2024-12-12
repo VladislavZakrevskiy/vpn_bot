@@ -7,10 +7,11 @@ export const getSuccessfulPayload = (link: string) =>
 
 *1. Скачайте и установите приложение Hiddify на ваше устройство:*
 
-iOS: https://apps.apple.com/us/app/hiddify-proxy-vpn/id6596777532?platform=iphone
-macOS: https://github.com/hiddify/hiddify-app/releases/latest/download/Hiddify-MacOS.dmg
-Windows: https://github.com/hiddify/hiddify-app/releases/latest/download/Hiddify-Windows-Setup-x64.Msix
-Linux: https://github.com/hiddify/hiddify-app/releases/latest/download/Hiddify-Linux-x64.AppImage
+📱 [iOS](https://apps.apple.com/us/app/hiddify-proxy-vpn/id6596777532?platform=iphone)
+🤖 [Android](https://play.google.com/store/apps/details?id=app.hiddify.com&hl=ru)
+💻 [MacOS](https://apps.apple.com/us/app/hiddify-proxy-vpn/id6596777532?platform=iphone)
+🖥️ [Windows](https://github.com/hiddify/hiddify-app/releases/latest/download/Hiddify-Windows-Setup-x64.Msix)
+💾 [Linux](https://github.com/hiddify/hiddify-app/releases/latest/download/Hiddify-Linux-x64.AppImage)
 
 *2. Запустите клиент Hiddify на вашем устройстве.*
 
@@ -27,4 +28,4 @@ ${link}
 Теперь вы готовы к безопасному серфингу в интернете! 🌍💻
 
 *С уважением,*
-*CareVPN*`);
+*VPN*`);

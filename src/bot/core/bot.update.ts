@@ -30,9 +30,10 @@ export class BotCoreUpdate {
     if (!dbUser) {
       const vpnBot = await this.vpnAdminService.createUser({
         lang: user.language_code || 'ru',
-        name: [user.first_name, user.last_name, user.username].join(' '),
+        name: [user.username, ctx.from.id].join(' '),
         package_days: 0,
         usage_limit_GB: 0,
+        telegram_id: ctx.from.id,
       });
       await this.userService.createUser({
         tg_id: user.id.toString(),

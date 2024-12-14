@@ -9,8 +9,10 @@ import { RateUpdate } from './rate/rate.update';
 import { CardPaymentService } from './rate/payment/card_payment.update';
 import { CryptoPaymentService } from './rate/payment/crypto_payment.update';
 import { StarsPaymentService } from './rate/payment/stars_payment';
+import { CryptoController } from './rate/payment/crypto.controller';
 
 @Module({
+  controllers: [CryptoController],
   imports: [UserModule, PrismaModule, RateModule, PurchaseModule, VpnModule],
   providers: [
     BotCoreUpdate,

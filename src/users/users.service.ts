@@ -42,6 +42,7 @@ export class UserService {
               },
             },
           );
+          return;
         }
         if (hoursDiff < 24) {
           await this.bot.telegram.sendMessage(
@@ -56,6 +57,7 @@ export class UserService {
               },
             },
           );
+          return;
         }
         if (hoursDiff <= 0) {
           await this.updateUser(
@@ -81,6 +83,7 @@ export class UserService {
               },
             },
           );
+          return;
         }
       }
     }

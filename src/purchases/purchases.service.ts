@@ -18,6 +18,10 @@ export class PurchaseService {
     return this.prisma.purchase.findMany({ where: { rate_id } });
   }
 
+  async getPurchaseByQuery(where: Prisma.PurchaseWhereInput) {
+    return await this.prisma.purchase.findMany({ where });
+  }
+
   async getPurchasesByRateUser(
     rate_id: string,
     user_id: string,

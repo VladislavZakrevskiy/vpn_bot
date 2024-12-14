@@ -32,6 +32,7 @@ model Purchase {
   rate_id String @db.Uuid
   rate    Rate   @relation(fields: [rate_id], references: [id])
   vpn_token String?  
+  hash String?
 
   purchase_date DateTime
   amount        Int

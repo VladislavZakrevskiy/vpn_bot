@@ -1,140 +1,36 @@
-export enum InvoiceStatus {
-  Active = 'active',
-  Paid = 'paid',
-  Expired = 'expired',
-  Unknown = 'unknown',
-}
-
-export type PaidBtnName = 'viewItem' | 'openChannel' | 'openBot' | 'callback';
-
-export enum CurrencyType {
-  Crypto = 'crypto',
-  Fiat = 'fiat',
-  Unknown = 'unknown',
-}
-
-export type CryptoCurrencyCode =
-  | 'USDT'
-  | 'TON'
-  | 'BTC'
-  | 'ETH'
-  | 'LTC'
-  | 'BNB'
-  | 'TRX'
-  | 'USDC'
-  | 'JET';
-export type FiatCurrencyCode =
-  | 'USD'
-  | 'EUR'
-  | 'RUB'
-  | 'BYN'
-  | 'UAH'
-  | 'GBP'
-  | 'CNY'
-  | 'KZT'
-  | 'UZS'
-  | 'GEL'
-  | 'TRY'
-  | 'AMD'
-  | 'THB'
-  | 'INR'
-  | 'BRL'
-  | 'IDR'
-  | 'AZN'
-  | 'AED'
-  | 'PLN'
-  | 'ILS';
-export type CurrencyCode =
-  | CryptoCurrencyCode
-  | FiatCurrencyCode
-  | 'KGS'
-  | 'TJS';
-
-export type Invoice = {
-  /** Invoice identifier */
-  id: number;
-  /** Invoice status */
-  status: InvoiceStatus;
-  /** Invoice hash */
+export interface Payload {
+  invoice_id: number;
   hash: string;
-  /** Invoice currency type */
-  currencyType: CurrencyType;
-  /** Invoice currency code */
-  currency: CurrencyCode;
-  /** Invoice amount */
+  currency_type: string;
+  fiat: string;
   amount: string;
-  /** Invoice pay url for user by bot */
-  botPayUrl: string;
-  /** Invoice pay url for user by mini app */
-  miniAppPayUrl: string;
-  /** Invoice pay url for user by web app */
-  webAppPayUrl: string;
-  /** Is invoice allow user comment */
-  isAllowComments: boolean;
-  /** Is user can pay invoice anonymously */
-  isAllowAnonymous: boolean;
-  /** Invoice created date */
-  createdAt: Date;
-  /** Text of the hidden message, only if set in invoice creation */
-  hiddenMessage?: string;
-  /** Is invoice paid anonymously, only for paid invoice */
-  isPaidAnonymously?: boolean;
-  /** Invoice paid date, only for paid invoice */
-  paidAt?: Date;
-  /** Expiration date, only if set pay limit time in invoice creation */
-  expirationDate?: Date;
-  /** Invoice displayed to user description, only if `description` passed in invoice creation */
-  description?: string;
-  /**
-   * Invoice visible only to app payload, only if `payload` passed in invoice creation
-   *
-   * If for invoice creation passed not string in this field, will be converted by JSON.parse
-   */
-  payload?: any;
-  /**
-   * Invoice left user comment, only if set `isAllowComments` to true in invoice creation
-   * and user left comment
-   */
-  comment?: string;
-  /**
-   * Invoice displayed to user paid button name,
-   * only if `paidBtnName` passed in invoice creation
-   */
-  paidBtnName?: PaidBtnName;
-  /**
-   * Invoice displayed to user paid button url,
-   * only if `paidBtnUrl` passed in invoice creation
-   */
-  paidBtnUrl?: string;
-  /**
-   * Asset of service fees charged when the invoice was paid, only if status is InvoiceStatus.Paid
-   */
-  feeAsset?: CryptoCurrencyCode;
-  /**
-   * Amount of service fees charged when the invoice was paid, only if status is InvoiceStatus.Paid
-   */
-  fee?: number;
-  /**
-   * Price of the asset in USD, only if status is InvoiceStatus.Paid
-   */
-  usdRate?: number;
-  /**
-   * List of assets which can be used to pay the invoice, only if set in invoice creation
-   */
-  acceptedAssets?: CryptoCurrencyCode[];
-  /**
-   * Cryptocurrency alphabetic code for which the invoice was paid,
-   * only if currency type is CurrencyType.Fiat and status is InvoiceStatus.Paid
-   */
-  paidAsset?: CryptoCurrencyCode;
-  /**
-   * Amount of the invoice for which the invoice was paid,
-   * only if currency type is CurrencyType.Fiat and status is InvoiceStatus.Paid
-   */
-  paidAmount?: number;
-  /**
-   * The rate of the paid_asset valued in the fiat currency,
-   * only if currency type is CurrencyType.Fiat and status is InvoiceStatus.Paid
-   */
-  paidFiatRate?: number;
-};
+  paid_asset: string;
+  paid_amount: string;
+  paid_fiat_rate: string;
+  accepted_assets: string[];
+  fee_asset: string;
+  fee_amount: string;
+  fee: string;
+  fee_in_usd: string;
+  pay_url: string;
+  bot_invoice_url: string;
+  mini_app_invoice_url: string;
+  web_app_invoice_url: string;
+  description: string;
+  status: string;
+  created_at: string;
+  allow_comments: boolean;
+  allow_anonymous: boolean;
+  paid_usd_rate: string;
+  usd_rate: string;
+  paid_at: string;
+  paid_anonymously: boolean;
+  payload: string;
+}
+
+export interface Invoice {
+  update_id: number;
+  update_type: string;
+  request_date: string;
+  payload: Payload;
+}

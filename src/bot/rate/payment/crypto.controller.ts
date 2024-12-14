@@ -1,6 +1,7 @@
-import { Body, Post } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { Invoice } from 'src/bot/core/types/Invoice';
 
+@Controller('webhook')
 export class CryptoController {
   constructor() {}
 

@@ -65,6 +65,8 @@ export class CryptoController {
     }
   }
 
+  // IVTfDyudAuJ2
+
   @Get(process.env.CRYPTO_PAYMENT_TOKEN)
   async onPaidGET(@Body() invoice: Invoice) {
     console.log('GET', invoice);

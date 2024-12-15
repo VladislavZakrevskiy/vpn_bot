@@ -1,4 +1,12 @@
-import { Action, Ctx, Hears, InjectBot, Start, Update } from 'nestjs-telegraf';
+import {
+  Action,
+  Command,
+  Ctx,
+  Hears,
+  InjectBot,
+  Start,
+  Update,
+} from 'nestjs-telegraf';
 import { getStartText } from './texts/getStartText';
 import { TgUser } from './decorators/TgUser';
 import { TelegramUser } from './types/TelegramUser';
@@ -49,6 +57,17 @@ export class BotCoreUpdate {
       ]).resize(),
     );
     await this.rateUpdate.handleRateList(ctx);
+  }
+
+  @Command(process.env.TELEGRAM_BOT_TOKEN)
+  async sendAdmin(@Ctx() ctx: SessionSceneContext) {
+    await ctx.reply('Секретная админ панель', {
+      reply_markup: {
+        inline_keyboard: [
+          [{ web_app: { url: process.env.WEB_APP_URL }, text: 'Перейти' }],
+        ],
+      },
+    });
   }
 
   @Hears('🛒 Список тарифов')

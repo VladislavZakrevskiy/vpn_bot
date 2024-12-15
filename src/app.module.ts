@@ -5,6 +5,7 @@ import { PrismaModule } from './db/prisma.module';
 import { HttpModule } from '@nestjs/axios';
 import { session } from 'telegraf';
 import { ScheduleModule } from '@nestjs/schedule';
+import { SettingsModule } from './settings/settings.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { ScheduleModule } from '@nestjs/schedule';
       global: true,
       headers: { 'Hiddify-API-Key': process.env.PROXY_API_TOKEN },
     }),
+    SettingsModule,
   ],
   providers: [],
 })

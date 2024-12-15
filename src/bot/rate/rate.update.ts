@@ -117,6 +117,47 @@ export class RateUpdate {
 
     if (to_delete) ctx.deleteMessage(Number(to_delete));
     ctx.deleteMessage();
+    const { is_cart_enable, is_crypto_enable, is_star_enable } =
+      await this.prisma.settings.findFirst();
+
+    const buttons: InlineKeyboardButton[][] = [];
+
+    if (is_cart_enable) {
+      buttons.push([
+        {
+          callback_data: `card_${rate.id}`,
+          text: '💳 Оплатить картой',
+        },
+      ]);
+    }
+
+    if (is_crypto_enable) {
+      buttons.push([
+        {
+          callback_data: `crypto_${rate.id}`,
+          text: '🌎 Оплатить CryptoBot',
+        },
+      ]);
+    }
+
+    if (is_star_enable) {
+      buttons.push([
+        {
+          callback_data: `stars_${rate.id}`,
+          text: '⭐️ Оплатить звездами',
+        },
+      ]);
+    }
+
+    if (!is_cart_enable && !is_crypto_enable && !is_star_enable) {
+      buttons.push([
+        {
+          callback_data: 'no',
+          text: 'Никаких способов оплаты нет',
+        },
+      ]);
+    }
+
     ctx.replyWithMarkdownV2(
       escapeMarkdown(`*${rate.name}*
 *${rate.description}*
@@ -124,24 +165,7 @@ export class RateUpdate {
       {
         reply_markup: {
           inline_keyboard: [
-            [
-              {
-                callback_data: `crypto_${rate.id}`,
-                text: '🌎 Оплатить CryptoBot',
-              },
-            ],
-            [
-              {
-                callback_data: `card_${rate.id}`,
-                text: '💳 Оплатить картой',
-              },
-            ],
-            [
-              {
-                callback_data: `stars_${rate.id}`,
-                text: '⭐️ Оплатить звездами',
-              },
-            ],
+            ...buttons,
             [
               {
                 callback_data: `return_rate_list`,

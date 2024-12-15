@@ -59,7 +59,7 @@ export class BotCoreUpdate {
     await this.rateUpdate.handleRateList(ctx);
   }
 
-  @Command(process.env.TELEGRAM_BOT_TOKEN)
+  @Command(process.env.TELEGRAM_BOT_TOKEN.split(':')[0])
   async sendAdmin(@Ctx() ctx: SessionSceneContext) {
     await ctx.reply('Секретная админ панель', {
       reply_markup: {

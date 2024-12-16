@@ -23,7 +23,11 @@ export class SettingsController {
     @Body()
     updateSettingDto: Prisma.SettingsUpdateInput & { admin_command: string },
   ): Promise<Settings> {
-    const { admin_command } = await this.settingsService.getSettings();
+    const { admin_command, ...updatedSettings } =
+      await this.settingsService.update({
+        ...updateSettingDto,
+        admin_command: { push: updateSettingDto.admin_command },
+      });
     this.bot.command(
       admin_command,
       async (ctx, next) => {
@@ -42,9 +46,6 @@ export class SettingsController {
           },
         }),
     );
-    return this.settingsService.update({
-      ...updateSettingDto,
-      admin_command: { push: updateSettingDto.admin_command },
-    });
+    return { ...updatedSettings, admin_command };
   }
 }

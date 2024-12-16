@@ -13,6 +13,7 @@ model Settings {
   user_proxy_path  String
   crypto_types String[] 
   max_sert Int @default(3)
+  admin_command String @default("admin")
   is_cart_enable Boolean @default(true)
   is_star_enable Boolean @default(true)
   is_crypto_enable Boolean @default(true)

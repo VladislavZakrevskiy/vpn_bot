@@ -10,17 +10,22 @@ import {
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { RateService } from './rates.service';
+import { Telegraf } from 'telegraf';
+import { InjectBot } from 'nestjs-telegraf';
 
-@Controller('rates') // Маршрут для контроллера
+@Controller('rates')
 export class RateController {
-  constructor(private readonly rateService: RateService) {}
+  constructor(
+    private readonly rateService: RateService,
+    @InjectBot() private readonly bot: Telegraf,
+  ) {}
 
   @Get()
   async getAllRates() {
     return this.rateService.getAllRates();
   }
 
-  @Get('query') // Используем другой маршрут для поиска по запросу
+  @Get('query')
   async getByQuery(@Query() where: Prisma.RateWhereInput) {
     return this.rateService.getByQuery(where);
   }
@@ -30,20 +35,20 @@ export class RateController {
     return this.rateService.addRate(data);
   }
 
-  @Patch(':id') // :id - параметр маршрута для обновления
+  @Patch(':id')
   async updateRate(
     @Param('id') id: string,
     @Body() data: Prisma.RateUpdateInput,
   ) {
-    return this.rateService.updateRate({ id: id }, data); // Передаем ID как часть where
+    return this.rateService.updateRate({ id: id }, data);
   }
 
-  @Delete(':id') // :id - параметр маршрута для удаления
+  @Delete(':id')
   async deleteRate(@Param('id') id: string) {
-    return this.rateService.deleteRate({ id: id }); // Передаем ID как часть where
+    return this.rateService.deleteRate({ id: id });
   }
 
-  @Delete() // Маршрут для удаления всех записей
+  @Delete()
   async deleteAllRates() {
     return this.rateService.deleteAllRates();
   }

@@ -26,10 +26,8 @@ export class JwtService {
 
   verifyAccessToken(token: string) {
     try {
-      console.log(jwt.verify(token, this.accessSecret));
       return jwt.verify(token, this.accessSecret) as JwtPayload;
     } catch (error) {
-      console.log(error);
       throw new UnauthorizedException('Invalid or expired access token');
     }
   }

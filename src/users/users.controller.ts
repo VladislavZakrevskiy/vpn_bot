@@ -34,7 +34,6 @@ export class UserController {
           vpnUsers.push({ ...user, vpn: vpnUser.data });
         }
       } catch (e) {
-        console.log('ERROR CONTROLLER', e);
         await this.userService.deleteUser({ id: user.id });
       }
     }
@@ -66,7 +65,6 @@ export class UserController {
           vpnUsers.push({ ...user, vpn: vpnUser.data });
         }
       } catch (e) {
-        console.log('ERROR CONTROLLER', e);
         await this.userService.deleteUser({ id: user.id });
       }
     }

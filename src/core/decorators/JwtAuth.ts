@@ -14,7 +14,6 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 
   canActivate(context: ExecutionContext) {
     const request = context.switchToHttp().getRequest();
-    console.log(request);
     const token = request.headers['authorization']?.split(' ')[1];
 
     if (!token) {
@@ -22,13 +21,10 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     }
 
     try {
-      console.log('decode');
       const decoded = this.jwtService.verifyAccessToken(token);
-      console.log('decoded', decoded);
       request.user = decoded.user;
       return true;
     } catch (error) {
-      console.log(error);
       throw new UnauthorizedException('Invalid or expired token');
     }
   }

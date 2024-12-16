@@ -26,7 +26,5 @@ import { SettingsModule } from './settings/settings.module';
   providers: [],
 })
 export class AppModule {
-  constructor() {
-    console.log('app');
-  }
+  constructor() {}
 }

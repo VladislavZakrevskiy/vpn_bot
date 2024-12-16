@@ -72,10 +72,6 @@ export class StarsPaymentService {
       ctx.message.successful_payment.invoice_payload.split('_')[1];
     const rate = await this.rateService.getByQuery({ id: rate_id });
     const vpnUser = (await this.vpnAdminService.getUser(user.vpn_uuid)).data;
-    console.log(
-      vpnUser.usage_limit_GB + rate.GB_limit,
-      vpnUser.usage_limit_GB + rate.GB_limit,
-    );
     await this.vpnAdminService.updateUser(user.vpn_uuid, {
       usage_limit_GB: vpnUser.usage_limit_GB + rate.GB_limit,
       enable: true,

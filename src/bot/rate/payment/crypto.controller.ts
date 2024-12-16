@@ -26,7 +26,6 @@ export class CryptoController {
   @UseGuards(JwtAuthGuard)
   @Post(process.env.CRYPTO_PAYMENT_TOKEN)
   async onPaidPOST(@Body() invoice: Invoice) {
-    console.log('POST', invoice);
     if (invoice.update_type && invoice.update_type === 'invoice_paid') {
       const purchaseCandidate = this.purchaseService.getPurchaseByQuery({
         hash: invoice.payload.payload,
@@ -71,7 +70,6 @@ export class CryptoController {
   @UseGuards(JwtAuthGuard)
   @Get(process.env.CRYPTO_PAYMENT_TOKEN)
   async onPaidGET(@Body() invoice: Invoice) {
-    console.log('GET', invoice);
     if (invoice.update_type && invoice.update_type === 'invoice_paid') {
       const purchaseCandidate = this.purchaseService.getPurchaseByQuery({
         hash: invoice.payload.payload,

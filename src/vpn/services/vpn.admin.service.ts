@@ -114,7 +114,6 @@ export class VpnAdminService {
       );
       return { data: res.data, status: res.status };
     } catch (error) {
-      console.log(error);
       return { data: null, status: error.status || 404 };
     }
   }

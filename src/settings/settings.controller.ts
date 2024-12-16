@@ -28,7 +28,7 @@ export class SettingsController {
       admin_command,
       async (ctx, next) => {
         const { admin_command } = await this.settingsService.getSettings();
-        console.log(ctx.text);
+        console.log('controller', ctx.text);
         if (ctx.text === '/' + admin_command[admin_command.length - 1]) {
           await next();
         }

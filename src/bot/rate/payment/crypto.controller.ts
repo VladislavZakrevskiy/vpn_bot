@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { Currency } from '@prisma/client';
 import { InjectBot } from 'nestjs-telegraf';
 import { Invoice } from 'src/bot/core/types/Invoice';
@@ -10,6 +10,7 @@ import { VpnUserService } from 'src/vpn/services/vpn.user.service';
 import { Telegraf } from 'telegraf';
 import * as dayjs from 'dayjs';
 import { getSuccessfulPayload } from 'src/bot/core/texts/getSuccessfulPayload.';
+import { JwtAuthGuard } from 'src/core/decorators/JwtAuth';
 
 @Controller('webhook')
 export class CryptoController {
@@ -22,6 +23,7 @@ export class CryptoController {
     private purchaseService: PurchaseService,
   ) {}
 
+  @UseGuards(JwtAuthGuard)
   @Post(process.env.CRYPTO_PAYMENT_TOKEN)
   async onPaidPOST(@Body() invoice: Invoice) {
     console.log('POST', invoice);
@@ -66,8 +68,7 @@ export class CryptoController {
     }
   }
 
-  // IVTfDyudAuJ2
-
+  @UseGuards(JwtAuthGuard)
   @Get(process.env.CRYPTO_PAYMENT_TOKEN)
   async onPaidGET(@Body() invoice: Invoice) {
     console.log('GET', invoice);

@@ -1,8 +1,9 @@
-import { Body, Controller, Get, Patch } from '@nestjs/common';
+import { Body, Controller, Get, Patch, UseGuards } from '@nestjs/common';
 import { Prisma, Settings } from '@prisma/client';
 import { SettingsService } from './settings.service';
 import { Telegraf } from 'telegraf';
 import { InjectBot } from 'nestjs-telegraf';
+import { JwtAuthGuard } from 'src/core/decorators/JwtAuth';
 
 @Controller('settings')
 export class SettingsController {
@@ -11,6 +12,7 @@ export class SettingsController {
     @InjectBot() private readonly bot: Telegraf,
   ) {}
 
+  @UseGuards(JwtAuthGuard)
   @Get()
   async getSettings() {
     const { admin_command, ...settings } =
@@ -21,6 +23,7 @@ export class SettingsController {
     };
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch()
   async update(
     @Body()

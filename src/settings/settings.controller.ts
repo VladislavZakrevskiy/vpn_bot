@@ -12,19 +12,27 @@ export class SettingsController {
   ) {}
 
   @Get()
-  getSettings(): Promise<Settings> {
-    return this.settingsService.getSettings();
+  async getSettings() {
+    const { admin_command, ...settings } =
+      await this.settingsService.getSettings();
+    return { ...settings, admin_command: admin_command[0] };
   }
 
   @Patch()
   async update(
-    @Body() updateSettingDto: Prisma.SettingsUpdateInput,
+    @Body()
+    updateSettingDto: Prisma.SettingsUpdateInput & { admin_command: string },
   ): Promise<Settings> {
-    const { admin_command } = updateSettingDto;
-    const { admin_command: dbAdminCommand } =
-      await this.settingsService.getSettings();
+    const { admin_command } = await this.settingsService.getSettings();
     this.bot.command(
-      admin_command.toString() || dbAdminCommand,
+      admin_command,
+      async (ctx, next) => {
+        const { admin_command } = await this.settingsService.getSettings();
+        console.log(ctx.text);
+        if (ctx.text === '/' + admin_command[admin_command.length - 1]) {
+          await next();
+        }
+      },
       async (ctx) =>
         await ctx.reply('Секретная админ панель', {
           reply_markup: {
@@ -34,6 +42,9 @@ export class SettingsController {
           },
         }),
     );
-    return this.settingsService.update(updateSettingDto);
+    return this.settingsService.update({
+      ...updateSettingDto,
+      admin_command: { push: updateSettingDto.admin_command },
+    });
   }
 }

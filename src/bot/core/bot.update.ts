@@ -27,10 +27,16 @@ export class BotCoreUpdate {
   }
 
   async setAdmin() {
-    const { admin_command: dbAdminCommand } =
-      await this.settingsService.getSettings();
+    const { admin_command } = await this.settingsService.getSettings();
     this.bot.command(
-      dbAdminCommand,
+      admin_command,
+      async (ctx, next) => {
+        const { admin_command } = await this.settingsService.getSettings();
+        console.log(ctx.text);
+        if (ctx.text === '/' + admin_command[admin_command.length - 1]) {
+          await next();
+        }
+      },
       async (ctx) =>
         await ctx.reply('Секретная админ панель', {
           reply_markup: {

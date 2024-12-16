@@ -10,15 +10,10 @@ import {
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { RateService } from './rates.service';
-import { Telegraf } from 'telegraf';
-import { InjectBot } from 'nestjs-telegraf';
 
 @Controller('rates')
 export class RateController {
-  constructor(
-    private readonly rateService: RateService,
-    @InjectBot() private readonly bot: Telegraf,
-  ) {}
+  constructor(private readonly rateService: RateService) {}
 
   @Get()
   async getAllRates() {

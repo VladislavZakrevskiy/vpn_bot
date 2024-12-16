@@ -15,7 +15,10 @@ export class SettingsController {
   async getSettings() {
     const { admin_command, ...settings } =
       await this.settingsService.getSettings();
-    return { ...settings, admin_command: admin_command[0] };
+    return {
+      ...settings,
+      admin_command: admin_command[admin_command.length - 1],
+    };
   }
 
   @Patch()

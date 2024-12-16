@@ -110,7 +110,7 @@ export class BotCoreUpdate {
       );
       hoursDiff += Math.abs(dayjs(new Date()).diff(lastDay, 'hours'));
     }
-    const vpnUser = await this.vpnAdminService.getUser(user.vpn_uuid);
+    const vpnUser = (await this.vpnAdminService.getUser(user.vpn_uuid)).data;
 
     await ctx.replyWithMarkdownV2(
       getProfile(

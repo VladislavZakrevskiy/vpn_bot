@@ -111,6 +111,6 @@ export class VpnAdminService {
     const res = await lastValueFrom(
       this.httpService.get<User, Partial<User>>(`${url}/admin/user/${id}`),
     );
-    return res.data;
+    return { data: res.data, status: res.status };
   }
 }

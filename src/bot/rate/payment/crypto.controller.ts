@@ -36,7 +36,8 @@ export class CryptoController {
           tg_id: String(tg_id),
         });
         const rate = await this.rateService.getByQuery({ id: rate_id });
-        const vpnUser = await this.vpnAdminService.getUser(user.vpn_uuid);
+        const vpnUser = (await this.vpnAdminService.getUser(user.vpn_uuid))
+          .data;
         await this.vpnAdminService.updateUser(user.vpn_uuid, {
           usage_limit_GB: vpnUser.usage_limit_GB + rate.GB_limit,
           enable: true,
@@ -81,7 +82,8 @@ export class CryptoController {
           tg_id: String(tg_id),
         });
         const rate = await this.rateService.getByQuery({ id: rate_id });
-        const vpnUser = await this.vpnAdminService.getUser(user.vpn_uuid);
+        const vpnUser = (await this.vpnAdminService.getUser(user.vpn_uuid))
+          .data;
         await this.vpnAdminService.updateUser(user.vpn_uuid, {
           usage_limit_GB: vpnUser.usage_limit_GB + rate.GB_limit,
           enable: true,

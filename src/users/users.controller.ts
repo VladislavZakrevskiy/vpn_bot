@@ -17,11 +17,16 @@ export class UserController {
     const vpnUsers: (User & { vpn: VpnUser })[] = [];
 
     for (const user of users) {
-      const vpnUser = await this.vpnAdminService.getUser(user.vpn_uuid);
-      if (!vpnUser) {
+      try {
+        const vpnUser = await this.vpnAdminService.getUser(user.vpn_uuid);
+        if (vpnUser.status === 404) {
+          await this.userService.deleteUser({ id: user.id });
+        } else {
+          vpnUsers.push({ ...user, vpn: vpnUser.data });
+        }
+      } catch (e) {
+        console.log('ERROR CONTROLLER', e);
         await this.userService.deleteUser({ id: user.id });
-      } else {
-        vpnUsers.push({ ...user, vpn: vpnUser });
       }
     }
 
@@ -42,11 +47,16 @@ export class UserController {
     const vpnUsers: (User & { vpn: VpnUser })[] = [];
 
     for (const user of users) {
-      const vpnUser = await this.vpnAdminService.getUser(user.vpn_uuid);
-      if (!vpnUser) {
+      try {
+        const vpnUser = await this.vpnAdminService.getUser(user.vpn_uuid);
+        if (vpnUser.status === 404) {
+          await this.userService.deleteUser({ id: user.id });
+        } else {
+          vpnUsers.push({ ...user, vpn: vpnUser.data });
+        }
+      } catch (e) {
+        console.log('ERROR CONTROLLER', e);
         await this.userService.deleteUser({ id: user.id });
-      } else {
-        vpnUsers.push({ ...user, vpn: vpnUser });
       }
     }
 

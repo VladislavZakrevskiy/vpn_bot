@@ -71,7 +71,7 @@ export class CardPaymentService {
     const rate_id =
       ctx.message.successful_payment.invoice_payload.split('_')[1];
     const rate = await this.rateService.getByQuery({ id: rate_id });
-    const vpnUser = await this.vpnAdminService.getUser(user.vpn_uuid);
+    const vpnUser = (await this.vpnAdminService.getUser(user.vpn_uuid)).data;
     console.log(
       vpnUser.usage_limit_GB + rate.GB_limit,
       vpnUser.usage_limit_GB + rate.GB_limit,

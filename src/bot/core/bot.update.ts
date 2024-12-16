@@ -1,12 +1,4 @@
-import {
-  Action,
-  Command,
-  Ctx,
-  Hears,
-  InjectBot,
-  Start,
-  Update,
-} from 'nestjs-telegraf';
+import { Action, Ctx, Hears, InjectBot, Start, Update } from 'nestjs-telegraf';
 import { getStartText } from './texts/getStartText';
 import { TgUser } from './decorators/TgUser';
 import { TelegramUser } from './types/TelegramUser';
@@ -20,6 +12,7 @@ import * as dayjs from 'dayjs';
 import { Pagination } from '@vladislav_zakrevskiy/telegraf-pagination';
 import { generatePurchaseCardEntities } from './texts/getPurchaseText';
 import { escapeMarkdown } from './helpers/escapeMarkdown';
+import { SettingsService } from 'src/settings/settings.service';
 
 @Update()
 export class BotCoreUpdate {
@@ -28,7 +21,26 @@ export class BotCoreUpdate {
     private vpnAdminService: VpnAdminService,
     private rateUpdate: RateUpdate,
     @InjectBot() private bot: Telegraf,
-  ) {}
+    private settingsService: SettingsService,
+  ) {
+    this.setAdmin();
+  }
+
+  async setAdmin() {
+    const { admin_command: dbAdminCommand } =
+      await this.settingsService.getSettings();
+    this.bot.command(
+      dbAdminCommand,
+      async (ctx) =>
+        await ctx.reply('Секретная админ панель', {
+          reply_markup: {
+            inline_keyboard: [
+              [{ web_app: { url: process.env.WEB_APP_URL }, text: 'Перейти' }],
+            ],
+          },
+        }),
+    );
+  }
 
   @Start()
   async start(@Ctx() ctx: SessionSceneContext, @TgUser() user: TelegramUser) {
@@ -57,17 +69,6 @@ export class BotCoreUpdate {
       ]).resize(),
     );
     await this.rateUpdate.handleRateList(ctx);
-  }
-
-  @Command(process.env.TELEGRAM_BOT_TOKEN.split(':')[0])
-  async sendAdmin(@Ctx() ctx: SessionSceneContext) {
-    await ctx.reply('Секретная админ панель', {
-      reply_markup: {
-        inline_keyboard: [
-          [{ web_app: { url: process.env.WEB_APP_URL }, text: 'Перейти' }],
-        ],
-      },
-    });
   }
 
   @Hears('🛒 Список тарифов')

@@ -4,10 +4,11 @@ import { PrismaModule } from 'src/db/prisma.module';
 import { JwtService } from './jwt.service';
 import { AuthController } from './auth.controller';
 import { VpnModule } from 'src/vpn/vpn.module';
+import { UserController } from './users.controller';
 
 @Module({
   imports: [PrismaModule, VpnModule],
-  controllers: [AuthController],
+  controllers: [AuthController, UserController],
   providers: [UserService, JwtService],
   exports: [UserService],
 })

@@ -1,40 +1,55 @@
-import { Body, Controller, NotFoundException, Post } from '@nestjs/common';
-import * as crypto from 'crypto';
+import { Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { UserService } from './users.service';
-import { JwtService } from './jwt.service';
+import { VpnAdminService } from '../vpn/services/vpn.admin.service';
+import { User as VpnUser } from 'src/vpn/types/User';
+import { User } from '@prisma/client';
 
-@Controller('auth')
+@Controller('users')
 export class UserController {
   constructor(
-    private jwtService: JwtService,
     private userService: UserService,
+    private vpnAdminService: VpnAdminService,
   ) {}
 
-  @Post('/hash')
-  async getHash(@Body() { dataCheckString }: { dataCheckString: string }) {
-    if (!dataCheckString) throw new NotFoundException('No dataCheckString');
-    const data = dataCheckString.split('=');
-    const tg_user = JSON.parse(data[data.length - 1]);
+  @Get('')
+  async getUsers() {
+    const users = await this.userService.getUsersWithPurchaseByQuery({});
+    const vpnUsers: (User & { vpn: VpnUser })[] = [];
 
-    const secretKey = crypto
-      .createHmac('sha256', 'WebAppData')
-      .update(process.env.TELEGRAM_BOT_TOKEN)
-      .digest();
-    const calculatedHash = crypto
-      .createHmac('sha256', secretKey)
-      .update(dataCheckString)
-      .digest('hex');
+    for (const user of users) {
+      const vpnUser = await this.vpnAdminService.getUser(user.vpn_uuid);
+      if (!vpnUser) {
+        await this.userService.deleteUser({ id: user.id });
+      } else {
+        vpnUsers.push({ ...user, vpn: vpnUser });
+      }
+    }
 
-    const user = await this.userService.getUserByQuery({
-      tg_id: String(tg_user.id),
-    });
-    const accessToken = this.jwtService.generateAccessToken({
-      user,
-    });
+    return vpnUsers;
+  }
 
-    return {
-      hash: calculatedHash,
-      access_token: accessToken,
-    };
+  @Delete(':id')
+  async deleteUser(@Param('id') id: string) {
+    const user = await this.userService.deleteUser({ id });
+    const vpnUser = await this.vpnAdminService.deleteUser(user.vpn_uuid);
+
+    return { ...user, vpn: vpnUser };
+  }
+
+  @Post('synchronize')
+  async synchronizeUsers() {
+    const users = await this.userService.getUsersWithPurchaseByQuery({});
+    const vpnUsers: (User & { vpn: VpnUser })[] = [];
+
+    for (const user of users) {
+      const vpnUser = await this.vpnAdminService.getUser(user.vpn_uuid);
+      if (!vpnUser) {
+        await this.userService.deleteUser({ id: user.id });
+      } else {
+        vpnUsers.push({ ...user, vpn: vpnUser });
+      }
+    }
+
+    return vpnUsers;
   }
 }

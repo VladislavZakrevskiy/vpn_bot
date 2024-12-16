@@ -32,7 +32,6 @@ export class BotCoreUpdate {
       admin_command,
       async (ctx, next) => {
         const { admin_command } = await this.settingsService.getSettings();
-        console.log('update', ctx.text);
         if (ctx.text === '/' + admin_command[admin_command.length - 1]) {
           await next();
         }

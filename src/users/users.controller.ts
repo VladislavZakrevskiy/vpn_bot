@@ -22,7 +22,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Get('')
   async getUsers() {
-    const users = await this.userService.getUsersWithPurchaseByQuery({});
+    const users = await this.userService.getUsersByQuery({});
     const vpnUsers: (User & { vpn: VpnUser })[] = [];
 
     for (const user of users) {
@@ -53,7 +53,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Post('synchronize')
   async synchronizeUsers() {
-    const users = await this.userService.getUsersWithPurchaseByQuery({});
+    const users = await this.userService.getUsersByQuery({});
     const vpnUsers: (User & { vpn: VpnUser })[] = [];
 
     for (const user of users) {

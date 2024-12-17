@@ -57,7 +57,8 @@ export class BotCoreUpdate {
 
   @Command('test')
   async onTest(@Ctx() ctx: SessionSceneContext) {
-    await ctx.replyWithMarkdownV2(`*bold \*text*
+    await ctx.replyWithMarkdownV2(
+      escapeMarkdown(`*bold \*text*
 _italic \*text_
 __underline__
 ~strikethrough~
@@ -83,7 +84,8 @@ pre-formatted fixed-width code block written in the Python programming language
 >Expandable block quotation continued
 >Hidden by default part of the expandable block quotation started
 >Expandable block quotation continued
->The last line of the expandable block quotation with the expandability mark||`);
+>The last line of the expandable block quotation with the expandability mark||`),
+    );
   }
 
   @Start()

@@ -6,6 +6,7 @@ import { HttpModule } from '@nestjs/axios';
 import { session } from 'telegraf';
 import { ScheduleModule } from '@nestjs/schedule';
 import { SettingsModule } from './settings/settings.module';
+import { MailingModule } from './mailing/mailing.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { SettingsModule } from './settings/settings.module';
       headers: { 'Hiddify-API-Key': process.env.PROXY_API_TOKEN },
     }),
     SettingsModule,
+    MailingModule,
   ],
   providers: [],
 })

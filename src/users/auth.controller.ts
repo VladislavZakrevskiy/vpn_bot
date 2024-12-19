@@ -1,6 +1,6 @@
 import { Body, Controller, NotFoundException, Post } from '@nestjs/common';
 import * as crypto from 'crypto';
-import { UserService } from './users.service';
+import { UserService } from './user/users.service';
 import { JwtService } from './jwt.service';
 
 @Controller('auth')

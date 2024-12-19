@@ -1,21 +1,17 @@
 import { Module } from '@nestjs/common';
-import { TelegrafModule } from 'nestjs-telegraf';
-import { BotModule } from './bot/bot.module';
 import { PrismaModule } from './db/prisma.module';
 import { HttpModule } from '@nestjs/axios';
-import { session } from 'telegraf';
 import { ScheduleModule } from '@nestjs/schedule';
 import { SettingsModule } from './settings/settings.module';
 import { MailingModule } from './mailing/mailing.module';
+import { BotModule } from './bots/bot/bot.module';
+import { SupportBotModule } from './bots/support/support.module';
 
 @Module({
   imports: [
-    TelegrafModule.forRoot({
-      token: process.env.TELEGRAM_BOT_TOKEN,
-      middlewares: [session()],
-    }),
     ScheduleModule.forRoot(),
     BotModule,
+    SupportBotModule,
     PrismaModule,
     HttpModule.register({
       baseURL: process.env.VPN_URL,

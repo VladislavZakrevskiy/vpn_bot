@@ -7,7 +7,6 @@ import {
   InlineKeyboardButton,
 } from 'telegraf/typings/core/types/typegram';
 import { escapeMarkdown } from '../core/helpers/escapeMarkdown';
-import { UserService } from '../../users/users.service';
 import { Telegraf } from 'telegraf';
 import { Currency } from '@prisma/client';
 import { PurchaseService } from 'src/purchases/purchases.service';
@@ -16,6 +15,7 @@ import { VpnAdminService } from 'src/vpn/services/vpn.admin.service';
 import { getSuccessfulPayload } from '../core/texts/getSuccessfulPayload.';
 import * as dayjs from 'dayjs';
 import { PrismaService } from 'src/db/prisma.service';
+import { UserService } from 'src/users/user/users.service';
 
 @Update()
 @Injectable()

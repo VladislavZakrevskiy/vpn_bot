@@ -6,11 +6,11 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { UserService } from './users.service';
-import { VpnAdminService } from '../vpn/services/vpn.admin.service';
 import { User as VpnUser } from 'src/vpn/types/User';
 import { User } from '@prisma/client';
 import { JwtAuthGuard } from 'src/core/decorators/JwtAuth';
+import { UserService } from './users.service';
+import { VpnAdminService } from 'src/vpn/services/vpn.admin.service';
 
 @Controller('users')
 export class UserController {

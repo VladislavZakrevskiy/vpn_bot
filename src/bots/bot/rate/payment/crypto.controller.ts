@@ -1,16 +1,16 @@
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { Currency } from '@prisma/client';
 import { InjectBot } from 'nestjs-telegraf';
-import { Invoice } from 'src/bot/core/types/Invoice';
 import { PurchaseService } from 'src/purchases/purchases.service';
 import { RateService } from 'src/rates/rates.service';
-import { UserService } from 'src/users/users.service';
+import { UserService } from 'src/users/user/users.service';
 import { VpnAdminService } from 'src/vpn/services/vpn.admin.service';
 import { VpnUserService } from 'src/vpn/services/vpn.user.service';
 import { Telegraf } from 'telegraf';
 import * as dayjs from 'dayjs';
-import { getSuccessfulPayload } from 'src/bot/core/texts/getSuccessfulPayload.';
 import { JwtAuthGuard } from 'src/core/decorators/JwtAuth';
+import { Invoice } from '../../core/types/Invoice';
+import { getSuccessfulPayload } from '../../core/texts/getSuccessfulPayload.';
 
 @Controller('webhook')
 export class CryptoController {

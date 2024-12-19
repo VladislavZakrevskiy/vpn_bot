@@ -1,18 +1,18 @@
 import { randomUUID } from 'crypto';
 import * as dayjs from 'dayjs';
 import { Action, Ctx, On, Update } from 'nestjs-telegraf';
-import { SessionSceneContext } from 'src/bot/core/types/Context';
 import { RateService } from 'src/rates/rates.service';
-import { UserService } from 'src/users/users.service';
-import { PurchaseService } from '../../../purchases/purchases.service';
+import { UserService } from 'src/users/user/users.service';
 import {
   CallbackQuery,
   SuccessfulPayment,
 } from 'telegraf/typings/core/types/typegram';
 import { Currency } from '@prisma/client';
-import { getSuccessfulPayload } from 'src/bot/core/texts/getSuccessfulPayload.';
 import { VpnUserService } from 'src/vpn/services/vpn.user.service';
 import { VpnAdminService } from 'src/vpn/services/vpn.admin.service';
+import { PurchaseService } from 'src/purchases/purchases.service';
+import { SessionSceneContext } from '../../core/types/Context';
+import { getSuccessfulPayload } from '../../core/texts/getSuccessfulPayload.';
 
 @Update()
 export class CardPaymentService {

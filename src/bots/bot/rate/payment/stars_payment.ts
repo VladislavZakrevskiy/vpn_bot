@@ -1,10 +1,9 @@
 import { Currency } from '@prisma/client';
 import { randomUUID } from 'crypto';
 import { Action, Ctx, On, Update } from 'nestjs-telegraf';
-import { SessionSceneContext } from 'src/bot/core/types/Context';
 import { PurchaseService } from 'src/purchases/purchases.service';
 import { RateService } from 'src/rates/rates.service';
-import { UserService } from 'src/users/users.service';
+import { UserService } from 'src/users/user/users.service';
 import { VpnAdminService } from 'src/vpn/services/vpn.admin.service';
 import { VpnUserService } from 'src/vpn/services/vpn.user.service';
 import {
@@ -12,7 +11,8 @@ import {
   SuccessfulPayment,
 } from 'telegraf/typings/core/types/typegram';
 import * as dayjs from 'dayjs';
-import { getSuccessfulPayload } from 'src/bot/core/texts/getSuccessfulPayload.';
+import { SessionSceneContext } from '../../core/types/Context';
+import { getSuccessfulPayload } from '../../core/texts/getSuccessfulPayload.';
 
 @Update()
 export class StarsPaymentService {

@@ -1,13 +1,13 @@
 import { randomUUID } from 'crypto';
 import { Action, Ctx, Update } from 'nestjs-telegraf';
-import { getCryptoPaymentText } from 'src/bot/core/texts/getCryptoPaymentText';
-import { SessionSceneContext } from 'src/bot/core/types/Context';
 import { PrismaService } from 'src/db/prisma.service';
 import { RateService } from 'src/rates/rates.service';
 import {
   CallbackQuery,
   InlineKeyboardButton,
 } from 'telegraf/typings/core/types/typegram';
+import { SessionSceneContext } from '../../core/types/Context';
+import { getCryptoPaymentText } from '../../core/texts/getCryptoPaymentText';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const CryptoBotAPI = require('crypto-bot-api');
 

@@ -8,35 +8,63 @@ datasource db {
 }
 
 model Settings {
-  id               String @id @unique @default(uuid()) @db.Uuid
+  id               String   @id @unique @default(uuid()) @db.Uuid
   admin_proxy_path String
   user_proxy_path  String
-  crypto_types String[] 
-  max_sert Int @default(3)
-  admin_command String[] @default(["admin"])
-  is_cart_enable Boolean @default(true)
-  is_star_enable Boolean @default(true)
-  is_crypto_enable Boolean @default(true)
+  crypto_types     String[]
+  max_sert         Int      @default(3)
+  admin_command    String[] @default(["admin"])
+  is_cart_enable   Boolean  @default(true)
+  is_star_enable   Boolean  @default(true)
+  is_crypto_enable Boolean  @default(true)
 }
 
 model User {
-  id         String     @id @unique @default(uuid()) @db.Uuid
-  tg_id      String     @unique
-  role       Role       @default(USER)
-  vpn_uuid   String
-  is_active  Boolean
-  was_trial Boolean @default(false)
-  purchases  Purchase[] 
+  id              String     @id @unique @default(uuid()) @db.Uuid
+  tg_id           String     @unique
+  role            Role       @default(USER)
+  vpn_uuid        String
+  is_active       Boolean
+  was_trial       Boolean    @default(false)
+  purchases       Purchase[]
+  support_tickets Ticket[]   @relation(name: "support")
+  user_tickets    Ticket[]   @relation(name: "user")
+  messages        Message[]
+}
+
+model Ticket {
+  id           String    @id @default(uuid()) @db.Uuid
+  status       Status
+  created_at   DateTime  @default(now())
+  messages     Message[]
+  supporter_id String    @db.Uuid
+  user_id      String    @db.Uuid
+  supporter    User      @relation(fields: [supporter_id], references: [id], name: "support")
+  user         User      @relation(fields: [user_id], references: [id], name: "user")
+}
+
+model Message {
+  id         String      @id @default(uuid()) @db.Uuid
+  text       String
+  type       MessageType
+  created_at DateTime    @default(now())
+  sended     Boolean
+  
+  user_id    String      @db.Uuid
+  user       User        @relation(fields: [user_id], references: [id])
+
+  ticket_id  String      @db.Uuid
+  ticket     Ticket      @relation(fields: [ticket_id], references: [id])
 }
 
 model Purchase {
-  id      String @id @unique @default(uuid()) @db.Uuid
-  user_id String @db.Uuid
-  user    User   @relation(fields: [user_id], references: [id])
-  rate_id String @db.Uuid
-  rate    Rate   @relation(fields: [rate_id], references: [id])
-  vpn_token String?  
-  hash String?
+  id        String  @id @unique @default(uuid()) @db.Uuid
+  user_id   String  @db.Uuid
+  user      User    @relation(fields: [user_id], references: [id])
+  rate_id   String  @db.Uuid
+  rate      Rate    @relation(fields: [rate_id], references: [id])
+  vpn_token String?
+  hash      String?
 
   purchase_date DateTime
   amount        Int
@@ -49,12 +77,22 @@ model Rate {
   name        String
   description String
   price       Int
-  price_XTR Int 
+  price_XTR   Int
   GB_limit    Int
   max_devices Int
   MB_speed    Int
-  expiresIn   Int 
+  expiresIn   Int
   purchases   Purchase[]
+}
+
+enum Status {
+  OPEN
+  CLOSE
+}
+
+enum MessageType {
+  TEXT
+  CLOSE
 }
 
 enum Currency {
@@ -65,5 +103,6 @@ enum Currency {
 
 enum Role {
   ADMIN
+  SUPPORT
   USER
 }

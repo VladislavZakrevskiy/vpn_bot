@@ -10,7 +10,7 @@ import {
 import { getStartText } from './texts/getStartText';
 import { TgUser } from './decorators/TgUser';
 import { TelegramUser } from './types/TelegramUser';
-import { UserService } from 'src/users/users.service';
+import { UserService } from 'src/users/user/users.service';
 import { VpnAdminService } from 'src/vpn/services/vpn.admin.service';
 import { RateUpdate } from '../rate/rate.update';
 import { SessionSceneContext } from './types/Context';
@@ -110,6 +110,7 @@ pre-formatted fixed-width code block written in the Python programming language
       Markup.keyboard([
         [Markup.button.callback('🛒 Список тарифов', 'rate_list')],
         [Markup.button.callback('👤 Профиль', 'profile')],
+        [Markup.button.callback('🗣 Поддержка', 'support')],
       ]).resize(),
     );
     await this.rateUpdate.handleRateList(ctx);
@@ -165,6 +166,13 @@ pre-formatted fixed-width code block written in the Python programming language
         },
       },
     );
+  }
+
+  @Hears('🗣 Поддержка')
+  async sendSupport(@Ctx() ctx: SessionSceneContext) {
+    await ctx.replyWithMarkdownV2(`*Поддержка*
+Если у вас случилась проблема, вы можете обратиться в нашу поддержку, которая вам быстро ответит
+@its3net_help_bot`);
   }
 
   @Action('user_purchases')

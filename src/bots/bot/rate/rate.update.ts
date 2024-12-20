@@ -2,10 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { RateService } from 'src/rates/rates.service';
 import { SessionSceneContext } from '../core/types/Context';
 import { Action, Ctx, InjectBot, Update } from 'nestjs-telegraf';
-import {
-  CallbackQuery,
-  InlineKeyboardButton,
-} from 'telegraf/typings/core/types/typegram';
+import { CallbackQuery, InlineKeyboardButton } from 'telegraf/typings/core/types/typegram';
 import { escapeMarkdown } from '../core/helpers/escapeMarkdown';
 import { Telegraf } from 'telegraf';
 import { Currency } from '@prisma/client';
@@ -27,7 +24,7 @@ export class RateUpdate {
     private vpnUserService: VpnUserService,
     private vpnAdminService: VpnAdminService,
     private prisma: PrismaService,
-    @InjectBot() private bot: Telegraf,
+    @InjectBot('main') private bot: Telegraf,
   ) {}
 
   async handleRateList(ctx: SessionSceneContext, edit: boolean = false) {
@@ -67,11 +64,7 @@ export class RateUpdate {
       tg_id: ctx.from.id.toString(),
     });
     const settings = await this.prisma.settings.findFirst({});
-    if (
-      user?.purchases &&
-      user?.purchases.filter(({ active }) => active).length >=
-        (settings.max_sert || 3)
-    ) {
+    if (user?.purchases && user?.purchases.filter(({ active }) => active).length >= (settings.max_sert || 3)) {
       await ctx.replyWithMarkdownV2(
         escapeMarkdown(
           `Простите, у вас уже есть ${settings.max_sert || 3} активных тарифа! Если вы хотите делиться сертфикатами с ними, пожалуйста, порекомендуйте нас! Это просто, просто пришлите им имя бота @${this.bot.botInfo.username}`,
@@ -79,12 +72,8 @@ export class RateUpdate {
       );
       return;
     }
-    const rate_id = (
-      ctx.callbackQuery as CallbackQuery & { data: string }
-    ).data.split('_')[1];
-    const to_delete = (
-      ctx.callbackQuery as CallbackQuery & { data: string }
-    ).data.split('_')?.[2];
+    const rate_id = (ctx.callbackQuery as CallbackQuery & { data: string }).data.split('_')[1];
+    const to_delete = (ctx.callbackQuery as CallbackQuery & { data: string }).data.split('_')?.[2];
 
     const rate = await this.rateService.getByQuery({ id: rate_id });
     if (rate.price === 0) {
@@ -95,10 +84,7 @@ export class RateUpdate {
         enable: true,
         package_days: vpnUser.package_days + rate.expiresIn,
       });
-      await this.userService.updateUser(
-        { id: user.id },
-        { is_active: true, was_trial: true },
-      );
+      await this.userService.updateUser({ id: user.id }, { is_active: true, was_trial: true });
       const configs = await this.vpnUserService.getAllConfigs(user.vpn_uuid);
       const autoConfig = configs.find(({ name }) => name === 'Auto');
       await this.purchaseService.createPurchase({
@@ -117,8 +103,7 @@ export class RateUpdate {
 
     if (to_delete) ctx.deleteMessage(Number(to_delete));
     ctx.deleteMessage();
-    const { is_cart_enable, is_crypto_enable, is_star_enable } =
-      await this.prisma.settings.findFirst();
+    const { is_cart_enable, is_crypto_enable, is_star_enable } = await this.prisma.settings.findFirst();
 
     const buttons: InlineKeyboardButton[][] = [];
 

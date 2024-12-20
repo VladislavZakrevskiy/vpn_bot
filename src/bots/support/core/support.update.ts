@@ -1,15 +1,17 @@
-import { Ctx, Start, Update } from 'nestjs-telegraf';
+import { Ctx, InjectBot, Start, Update } from 'nestjs-telegraf';
 import { SessionSceneContext } from 'src/bots/bot/core/types/Context';
 import { UserService } from '../../../users/user/users.service';
 import { VpnAdminService } from 'src/vpn/services/vpn.admin.service';
 import { Role } from '@prisma/client';
 import { getSupportText } from './texts/getSupportText';
+import { Telegraf } from 'telegraf';
 
 @Update()
 export class SupportBotUpdate {
   constructor(
     private userService: UserService,
     private vpnAdminService: VpnAdminService,
+    @InjectBot('support') private readonly bot: Telegraf,
   ) {}
 
   @Start()

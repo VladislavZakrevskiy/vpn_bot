@@ -2,10 +2,7 @@ import { randomUUID } from 'crypto';
 import { Action, Ctx, Update } from 'nestjs-telegraf';
 import { PrismaService } from 'src/db/prisma.service';
 import { RateService } from 'src/rates/rates.service';
-import {
-  CallbackQuery,
-  InlineKeyboardButton,
-} from 'telegraf/typings/core/types/typegram';
+import { CallbackQuery, InlineKeyboardButton } from 'telegraf/typings/core/types/typegram';
 import { SessionSceneContext } from '../../core/types/Context';
 import { getCryptoPaymentText } from '../../core/texts/getCryptoPaymentText';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -20,9 +17,7 @@ export class CryptoPaymentService {
 
   @Action(/^crypto_(.+)$/)
   async sendPaymentInfo(@Ctx() ctx: SessionSceneContext) {
-    const rate_id = (
-      ctx.callbackQuery as CallbackQuery & { data: string }
-    ).data.split('_')[1];
+    const rate_id = (ctx.callbackQuery as CallbackQuery & { data: string }).data.split('_')[1];
     const settings = await this.prisma.settings.findMany();
     const { crypto_types } = settings[0];
 
@@ -30,9 +25,7 @@ export class CryptoPaymentService {
     for (let i = 0; i < crypto_types.length; i++) {
       const currency = crypto_types[i];
       if (i === crypto_types.length - 1) {
-        buttons.push([
-          { callback_data: `${currency}_${rate_id}`, text: currency },
-        ]);
+        buttons.push([{ callback_data: `${currency}_${rate_id}`, text: currency }]);
       } else {
         const nextCurrency = crypto_types[i + 1];
 
@@ -44,27 +37,17 @@ export class CryptoPaymentService {
       }
     }
     await ctx.deleteMessage();
-    await ctx.reply(
-      `Выберите криптовалюту через которую вам будет удобно провести платеж.`,
-      {
-        reply_markup: {
-          inline_keyboard: [
-            ...buttons,
-            [{ callback_data: `rate_${rate_id}`, text: '🔙 Назад' }],
-          ],
-        },
+    await ctx.reply(`Выберите криптовалюту через которую вам будет удобно провести платеж.`, {
+      reply_markup: {
+        inline_keyboard: [...buttons, [{ callback_data: `rate_${rate_id}`, text: '🔙 Назад' }]],
       },
-    );
+    });
   }
 
   @Action(/^(BTC|ETH|TON|BNB|BUSD|USDC|USDT)_(.+)$/)
   async sendCryptoInvoice(@Ctx() ctx: SessionSceneContext) {
-    const currency = (
-      ctx.callbackQuery as CallbackQuery & { data: string }
-    ).data.split('_')[0];
-    const rate_id = (
-      ctx.callbackQuery as CallbackQuery & { data: string }
-    ).data.split('_')[1];
+    const currency = (ctx.callbackQuery as CallbackQuery & { data: string }).data.split('_')[0];
+    const rate_id = (ctx.callbackQuery as CallbackQuery & { data: string }).data.split('_')[1];
     const rate = await this.rateService.getByQuery({ id: rate_id });
     const client = new CryptoBotAPI(process.env.CRYPTO_PAYMENT_TOKEN);
     const invoice = await client.createInvoice({
@@ -80,21 +63,18 @@ export class CryptoPaymentService {
     const currencyRate = await client.getExchangeRate(currency, 'USD');
 
     await ctx.deleteMessage();
-    await ctx.replyWithMarkdownV2(
-      getCryptoPaymentText((rate.price * currencyUSD) / currencyRate, currency),
-      {
-        reply_markup: {
-          inline_keyboard: [
-            [{ url: invoice.botPayUrl, text: '✅ Перейти к оплате' }],
-            [
-              {
-                callback_data: `crypto_${rate.id}`,
-                text: '🔙 Назад',
-              },
-            ],
+    await ctx.replyWithMarkdownV2(getCryptoPaymentText((rate.price * currencyUSD) / currencyRate, currency), {
+      reply_markup: {
+        inline_keyboard: [
+          [{ url: invoice.botPayUrl, text: '✅ Перейти к оплате' }],
+          [
+            {
+              callback_data: `crypto_${rate.id}`,
+              text: '🔙 Назад',
+            },
           ],
-        },
+        ],
       },
-    );
+    });
   }
 }

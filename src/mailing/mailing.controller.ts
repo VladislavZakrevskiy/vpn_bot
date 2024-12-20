@@ -7,7 +7,7 @@ import { Telegraf } from 'telegraf';
 export class MailingController {
   constructor(
     private prisma: PrismaService,
-    @InjectBot() private bot: Telegraf,
+    @InjectBot('main') private bot: Telegraf,
   ) {}
 
   @Post('')

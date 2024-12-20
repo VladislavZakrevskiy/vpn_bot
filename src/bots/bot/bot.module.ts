@@ -12,30 +12,11 @@ import { CryptoController } from './rate/payment/crypto.controller';
 import { SettingsModule } from 'src/settings/settings.module';
 import { JwtService } from 'src/users/jwt.service';
 import { PrismaModule } from 'src/db/prisma.module';
-import { TelegrafModule } from 'nestjs-telegraf';
-import { session } from 'telegraf';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   controllers: [CryptoController],
-  imports: [
-    TelegrafModule.forRoot({
-      token: process.env.TELEGRAM_BOT_TOKEN,
-      middlewares: [session()],
-    }),
-    UserModule,
-    PrismaModule,
-    RateModule,
-    PurchaseModule,
-    VpnModule,
-    SettingsModule,
-  ],
-  providers: [
-    BotCoreUpdate,
-    RateUpdate,
-    CardPaymentService,
-    CryptoPaymentService,
-    StarsPaymentService,
-    JwtService,
-  ],
+  imports: [UserModule, PrismaModule, RateModule, PurchaseModule, VpnModule, SettingsModule, ScheduleModule.forRoot()],
+  providers: [BotCoreUpdate, RateUpdate, CardPaymentService, CryptoPaymentService, StarsPaymentService, JwtService],
 })
 export class BotModule {}

@@ -28,10 +28,10 @@ export class TicketService {
     });
   }
 
-  async getTickets(user_id: string, where: Prisma.TicketWhereInput) {
+  async getTickets(user_id: string, where?: Prisma.TicketWhereInput, include?: Prisma.TicketInclude) {
     const user = await this.prisma.user.findUnique({
       where: { id: user_id },
-      include: { support_tickets: { where }, user_tickets: { where } },
+      include: { support_tickets: { where, include }, user_tickets: { where, include } },
     });
 
     return user.role === Role.SUPPORT ? user.support_tickets : user.user_tickets;
@@ -40,13 +40,16 @@ export class TicketService {
   async addTicket(user_id: string) {
     const supporters = await this.prisma.user.findMany({
       where: { role: 'SUPPORT' },
-      include: { support_tickets: true },
+      include: { support_tickets: { where: { status: 'OPEN' } } },
     });
     const support_tickets = supporters.map(({ support_tickets, id }) => ({
       id,
-      tickets: support_tickets.filter(({ status }) => status === 'OPEN').length,
+      tickets: support_tickets.length,
     }));
     const support_id = min(support_tickets, 'tickets')?.id;
+    if (!support_id) {
+      return;
+    }
 
     return await this.prisma.ticket.create({
       data: {

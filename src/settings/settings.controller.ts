@@ -9,14 +9,13 @@ import { JwtAuthGuard } from 'src/core/decorators/JwtAuth';
 export class SettingsController {
   constructor(
     private settingsService: SettingsService,
-    @InjectBot() private readonly bot: Telegraf,
+    @InjectBot('main') private readonly bot: Telegraf,
   ) {}
 
   @UseGuards(JwtAuthGuard)
   @Get()
   async getSettings() {
-    const { admin_command, ...settings } =
-      await this.settingsService.getSettings();
+    const { admin_command, ...settings } = await this.settingsService.getSettings();
     return {
       ...settings,
       admin_command: admin_command[admin_command.length - 1],
@@ -29,11 +28,10 @@ export class SettingsController {
     @Body()
     updateSettingDto: Prisma.SettingsUpdateInput & { admin_command: string },
   ): Promise<Settings> {
-    const { admin_command, ...updatedSettings } =
-      await this.settingsService.update({
-        ...updateSettingDto,
-        admin_command: { push: updateSettingDto.admin_command },
-      });
+    const { admin_command, ...updatedSettings } = await this.settingsService.update({
+      ...updateSettingDto,
+      admin_command: { push: updateSettingDto.admin_command },
+    });
     this.bot.command(
       admin_command,
       async (ctx, next) => {
@@ -45,9 +43,7 @@ export class SettingsController {
       async (ctx) =>
         await ctx.reply('Секретная админ панель', {
           reply_markup: {
-            inline_keyboard: [
-              [{ web_app: { url: process.env.WEB_APP_URL }, text: 'Перейти' }],
-            ],
+            inline_keyboard: [[{ web_app: { url: process.env.WEB_APP_URL }, text: 'Перейти' }]],
           },
         }),
     );

@@ -3,10 +3,7 @@ import * as dayjs from 'dayjs';
 import { Action, Ctx, On, Update } from 'nestjs-telegraf';
 import { RateService } from 'src/rates/rates.service';
 import { UserService } from 'src/users/user/users.service';
-import {
-  CallbackQuery,
-  SuccessfulPayment,
-} from 'telegraf/typings/core/types/typegram';
+import { CallbackQuery, SuccessfulPayment } from 'telegraf/typings/core/types/typegram';
 import { Currency } from '@prisma/client';
 import { VpnUserService } from 'src/vpn/services/vpn.user.service';
 import { VpnAdminService } from 'src/vpn/services/vpn.admin.service';
@@ -26,9 +23,7 @@ export class CardPaymentService {
 
   @Action(/^card_(.+)$/)
   async sendPaymentInfo(@Ctx() ctx: SessionSceneContext) {
-    const rate_id = (
-      ctx.callbackQuery as CallbackQuery & { data: string }
-    ).data.split('_')[1];
+    const rate_id = (ctx.callbackQuery as CallbackQuery & { data: string }).data.split('_')[1];
     const rate = await this.rateService.getByQuery({ id: rate_id });
     await ctx.deleteMessage();
     const invoice = await ctx.sendInvoice({
@@ -68,8 +63,7 @@ export class CardPaymentService {
     const user = await this.userService.getUserByQuery({
       tg_id: String(ctx.from.id),
     });
-    const rate_id =
-      ctx.message.successful_payment.invoice_payload.split('_')[1];
+    const rate_id = ctx.message.successful_payment.invoice_payload.split('_')[1];
     const rate = await this.rateService.getByQuery({ id: rate_id });
     const vpnUser = (await this.vpnAdminService.getUser(user.vpn_uuid)).data;
     await this.vpnAdminService.updateUser(user.vpn_uuid, {

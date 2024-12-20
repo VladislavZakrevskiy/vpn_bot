@@ -15,7 +15,7 @@ import { getSuccessfulPayload } from '../../core/texts/getSuccessfulPayload.';
 @Controller('webhook')
 export class CryptoController {
   constructor(
-    @InjectBot() private bot: Telegraf,
+    @InjectBot('main') private bot: Telegraf,
     private userService: UserService,
     private rateService: RateService,
     private vpnAdminService: VpnAdminService,
@@ -37,8 +37,7 @@ export class CryptoController {
           tg_id: String(tg_id),
         });
         const rate = await this.rateService.getByQuery({ id: rate_id });
-        const vpnUser = (await this.vpnAdminService.getUser(user.vpn_uuid))
-          .data;
+        const vpnUser = (await this.vpnAdminService.getUser(user.vpn_uuid)).data;
         await this.vpnAdminService.updateUser(user.vpn_uuid, {
           usage_limit_GB: vpnUser.usage_limit_GB + rate.GB_limit,
           enable: true,
@@ -58,11 +57,7 @@ export class CryptoController {
           user: { connect: { id: user.id } },
         });
 
-        await this.bot.telegram.sendMessage(
-          tg_id,
-          getSuccessfulPayload(autoConfig.link),
-          { parse_mode: 'HTML' },
-        );
+        await this.bot.telegram.sendMessage(tg_id, getSuccessfulPayload(autoConfig.link), { parse_mode: 'HTML' });
       }
     }
   }
@@ -81,8 +76,7 @@ export class CryptoController {
           tg_id: String(tg_id),
         });
         const rate = await this.rateService.getByQuery({ id: rate_id });
-        const vpnUser = (await this.vpnAdminService.getUser(user.vpn_uuid))
-          .data;
+        const vpnUser = (await this.vpnAdminService.getUser(user.vpn_uuid)).data;
         await this.vpnAdminService.updateUser(user.vpn_uuid, {
           usage_limit_GB: vpnUser.usage_limit_GB + rate.GB_limit,
           enable: true,
@@ -102,11 +96,7 @@ export class CryptoController {
           user: { connect: { id: user.id } },
         });
 
-        await this.bot.telegram.sendMessage(
-          tg_id,
-          getSuccessfulPayload(autoConfig.link),
-          { parse_mode: 'HTML' },
-        );
+        await this.bot.telegram.sendMessage(tg_id, getSuccessfulPayload(autoConfig.link), { parse_mode: 'HTML' });
       }
     }
   }

@@ -1,12 +1,4 @@
-import {
-  Action,
-  Command,
-  Ctx,
-  Hears,
-  InjectBot,
-  Start,
-  Update,
-} from 'nestjs-telegraf';
+import { Action, Command, Ctx, Hears, InjectBot, Start, Update } from 'nestjs-telegraf';
 import { getStartText } from './texts/getStartText';
 import { TgUser } from './decorators/TgUser';
 import { TelegramUser } from './types/TelegramUser';
@@ -28,7 +20,7 @@ export class BotCoreUpdate {
     private userService: UserService,
     private vpnAdminService: VpnAdminService,
     private rateUpdate: RateUpdate,
-    @InjectBot() private bot: Telegraf,
+    @InjectBot('main') private bot: Telegraf,
     private settingsService: SettingsService,
   ) {
     this.setAdmin();
@@ -47,9 +39,7 @@ export class BotCoreUpdate {
       async (ctx) =>
         await ctx.reply('Секретная админ панель', {
           reply_markup: {
-            inline_keyboard: [
-              [{ web_app: { url: process.env.WEB_APP_URL }, text: 'Перейти' }],
-            ],
+            inline_keyboard: [[{ web_app: { url: process.env.WEB_APP_URL }, text: 'Перейти' }]],
           },
         }),
     );
@@ -131,12 +121,10 @@ pre-formatted fixed-width code block written in the Python programming language
     const user = await this.userService.getUserWithPurchaseByQuery({
       tg_id: ctx.from.id.toString(),
     });
-    if (!user.purchases || user?.purchases?.length === 0) {
+    if (!user?.purchases || user?.purchases?.length === 0) {
       await ctx.replyWithMarkdownV2(getProfile(user), {
         reply_markup: {
-          inline_keyboard: [
-            [{ text: '🛒 Мои покупки', callback_data: 'user_purchases' }],
-          ],
+          inline_keyboard: [[{ text: '🛒 Мои покупки', callback_data: 'user_purchases' }]],
         },
       });
       return;
@@ -144,10 +132,7 @@ pre-formatted fixed-width code block written in the Python programming language
     const activePurchases = user.purchases?.filter(({ active }) => active);
     let hoursDiff = 0;
     for (const activePurchase of activePurchases) {
-      const lastDay = dayjs(activePurchase.purchase_date).add(
-        activePurchase.rate.expiresIn,
-        'D',
-      );
+      const lastDay = dayjs(activePurchase.purchase_date).add(activePurchase.rate.expiresIn, 'D');
       hoursDiff += Math.abs(dayjs(new Date()).diff(lastDay, 'hours'));
     }
     const vpnUser = (await this.vpnAdminService.getUser(user.vpn_uuid)).data;
@@ -160,9 +145,7 @@ pre-formatted fixed-width code block written in the Python programming language
       ),
       {
         reply_markup: {
-          inline_keyboard: [
-            [{ text: '🛒 Мои покупки', callback_data: 'user_purchases' }],
-          ],
+          inline_keyboard: [[{ text: '🛒 Мои покупки', callback_data: 'user_purchases' }]],
         },
       },
     );
@@ -172,7 +155,7 @@ pre-formatted fixed-width code block written in the Python programming language
   async sendSupport(@Ctx() ctx: SessionSceneContext) {
     await ctx.replyWithMarkdownV2(`*Поддержка*
 Если у вас случилась проблема, вы можете обратиться в нашу поддержку, которая вам быстро ответит
-@its3net_help_bot`);
+@its3net\\_help\\_bot`);
   }
 
   @Action('user_purchases')
@@ -187,9 +170,7 @@ pre-formatted fixed-width code block written in the Python programming language
 Вы можете их купить тут!`),
         {
           reply_markup: {
-            inline_keyboard: [
-              [{ callback_data: 'rate_list', text: '🛒 Список тарифов' }],
-            ],
+            inline_keyboard: [[{ callback_data: 'rate_list', text: '🛒 Список тарифов' }]],
           },
         },
       );

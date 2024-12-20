@@ -10,7 +10,7 @@ import { Telegraf } from 'telegraf';
 export class UserService {
   constructor(
     private prisma: PrismaService,
-    @InjectBot() private bot: Telegraf,
+    @InjectBot('main') private bot: Telegraf,
   ) {}
 
   @Cron(process.env.RATE_CHECK_TIME)
@@ -23,10 +23,7 @@ export class UserService {
         const activePurchases = purchases.filter(({ active }) => active);
         let hoursDiff = 0;
         for (const activePurchase of activePurchases) {
-          const lastDay = dayjs(activePurchase.purchase_date).add(
-            activePurchase.rate.expiresIn,
-            'D',
-          );
+          const lastDay = dayjs(activePurchase.purchase_date).add(activePurchase.rate.expiresIn, 'D');
           hoursDiff += Math.abs(dayjs(new Date()).diff(lastDay, 'hours'));
         }
         if (hoursDiff < 24 * 3) {
@@ -36,9 +33,7 @@ export class UserService {
 Успейте обновить!`,
             {
               reply_markup: {
-                inline_keyboard: [
-                  [{ callback_data: 'rate_list', text: '🛒 Список тарифов' }],
-                ],
+                inline_keyboard: [[{ callback_data: 'rate_list', text: '🛒 Список тарифов' }]],
               },
             },
           );
@@ -51,9 +46,7 @@ export class UserService {
 Успейте обновить!`,
             {
               reply_markup: {
-                inline_keyboard: [
-                  [{ callback_data: 'rate_list', text: '🛒 Список тарифов' }],
-                ],
+                inline_keyboard: [[{ callback_data: 'rate_list', text: '🛒 Список тарифов' }]],
               },
             },
           );
@@ -77,9 +70,7 @@ export class UserService {
             `🚨🚨🚨 Ваш тариф истек! Вы можете обновить его у нас в магазине!`,
             {
               reply_markup: {
-                inline_keyboard: [
-                  [{ callback_data: 'rate_list', text: '🛒 Список тарифов' }],
-                ],
+                inline_keyboard: [[{ callback_data: 'rate_list', text: '🛒 Список тарифов' }]],
               },
             },
           );
@@ -126,10 +117,7 @@ export class UserService {
     });
   }
 
-  async updateUser(
-    where: Prisma.UserWhereUniqueInput,
-    data: Prisma.UserUpdateInput,
-  ): Promise<User> {
+  async updateUser(where: Prisma.UserWhereUniqueInput, data: Prisma.UserUpdateInput): Promise<User> {
     return this.prisma.user.update({
       where,
       data,

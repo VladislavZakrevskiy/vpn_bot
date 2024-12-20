@@ -25,9 +25,13 @@ export class SupportUpdate {
 
     const { current_ticket_id } = ctx.session;
     if (!current_ticket_id) [await ctx.reply('Тикет не выбран')];
-    const { created_at, messages, id } = await this.ticketService.getTicket(current_ticket_id, {
-      messages: { take: 1 },
-    });
+    const { created_at, messages, id } = await this.ticketService.getTicket(
+      current_ticket_id,
+      {
+        messages: { take: 1 },
+      },
+      'OPEN',
+    );
 
     await ctx.replyWithMarkdownV2(`*Тикет от ${escapeMarkdown(created_at.toLocaleString())}*
 \`${escapeMarkdown(id)}\`
@@ -55,7 +59,7 @@ export class SupportUpdate {
       await ctx.reply('Введите какой-нибудь текст в сообщение!');
       return;
     }
-    const ticket = await this.ticketService.getTicket(current_ticket_id);
+    const ticket = await this.ticketService.getTicket(current_ticket_id, undefined, 'OPEN');
     await this.messageService.createMessage({
       sended: false,
       text: messageText,
@@ -120,7 +124,7 @@ export class SupportUpdate {
       return;
     }
 
-    const ticket = await this.ticketService.getTicket(ticket_id);
+    const ticket = await this.ticketService.getTicket(ticket_id, undefined, 'OPEN');
     if (!ticket) {
       await ctx.reply(`Такого тикета не существует! Проверьте на правильность введенную команду`);
       return;
@@ -147,9 +151,13 @@ export class SupportUpdate {
       return;
     }
 
-    const { messages, supporter_id } = await this.ticketService.getTicket(current_ticket_id, {
-      messages: true,
-    });
+    const { messages, supporter_id } = await this.ticketService.getTicket(
+      current_ticket_id,
+      {
+        messages: true,
+      },
+      'OPEN',
+    );
 
     if (messages.length === 0) {
       await ctx.reply('Простите, сообщений в этом тикете нет');

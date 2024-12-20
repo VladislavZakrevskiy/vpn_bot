@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { $Enums, Prisma, Role } from '@prisma/client';
+import { $Enums, Prisma, Role, Status } from '@prisma/client';
 import { PrismaService } from 'src/db/prisma.service';
 
 const min = <T>(array: T[], key: keyof T): T | undefined => {
@@ -21,9 +21,9 @@ const min = <T>(array: T[], key: keyof T): T | undefined => {
 export class TicketService {
   constructor(private prisma: PrismaService) {}
 
-  async getTicket(ticket_id: string, include?: Prisma.TicketInclude) {
+  async getTicket(ticket_id: string, include?: Prisma.TicketInclude, status?: Status) {
     return await this.prisma.ticket.findUnique({
-      where: { id: ticket_id, status: 'OPEN' },
+      where: { id: ticket_id, status: status },
       include,
     });
   }

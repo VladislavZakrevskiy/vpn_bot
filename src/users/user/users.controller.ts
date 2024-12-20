@@ -1,11 +1,4 @@
-import {
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Post,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { User as VpnUser } from 'src/vpn/types/User';
 import { User } from '@prisma/client';
 import { JwtAuthGuard } from 'src/core/decorators/JwtAuth';

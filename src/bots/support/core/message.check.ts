@@ -14,24 +14,26 @@ export class MessageCheckService {
 
   @Cron(process.env.MESSAGE_CHECK_TIME)
   async sendMessages() {
-    const messages = await this.messageService.getMessagesByQuery(
-      { sended: false },
-      { ticket: true },
-    );
+    const messages = await this.messageService.getMessagesByQuery({ sended: false }, { ticket: true });
 
     for (const message of messages) {
       const sender_id: { type: 'support' | 'user'; id: string } = {
         type: message.ticket.user_id === message.user_id ? 'user' : 'support',
-        id:
-          message.ticket.user_id === message.user_id
-            ? message.ticket.supporter_id
-            : message.ticket.user_id,
+        id: message.ticket.user_id === message.user_id ? message.ticket.supporter_id : message.ticket.user_id,
       };
-      await this.bot.telegram.sendMessage(
-        sender_id.id,
-        escapeMarkdown(`${sender_id.type === 'support' ? '*Сообщение от пользователя, тикет:*' + '`message.id`' : '*Сообщение от работника поддержки:*'}
-${message.text}`),
-      );
+      if (message.type === 'TEXT') {
+        await this.bot.telegram.sendMessage(
+          sender_id.id,
+          escapeMarkdown(`${sender_id.type === 'support' ? '*Сообщение от пользователя, тикет:*' + '`message.id`' : '*Сообщение от работника поддержки:*'}
+>${message.text}`),
+        );
+      } else {
+        await this.bot.telegram.sendMessage(sender_id.id, escapeMarkdown(`${message.text}`), {
+          reply_markup: {
+            inline_keyboard: [[{ callback_data: 'close_ticket', text: 'Закрыть проблему' }]],
+          },
+        });
+      }
     }
 
     await this.messageService.toggleSended(messages.map(({ id }) => id));

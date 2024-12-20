@@ -6,7 +6,7 @@ import { Role } from '@prisma/client';
 import { getSupportText } from './texts/getSupportText';
 
 @Update()
-export class SupportUpdate {
+export class SupportBotUpdate {
   constructor(
     private userService: UserService,
     private vpnAdminService: VpnAdminService,

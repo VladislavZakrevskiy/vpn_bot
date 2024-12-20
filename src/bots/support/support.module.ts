@@ -6,7 +6,9 @@ import { UserModule } from 'src/users/users.module';
 import { VpnModule } from 'src/vpn/vpn.module';
 import { session } from 'telegraf';
 import { MessageCheckService } from './core/message.check';
-import { SupportUpdate } from './core/support.update';
+import { SupportBotUpdate } from './core/support.update';
+import { UserUpdate } from './user/user.update';
+import { SupportUpdate } from './supporter/support.update';
 
 @Module({
   imports: [
@@ -19,6 +21,6 @@ import { SupportUpdate } from './core/support.update';
     UserModule,
     VpnModule,
   ],
-  providers: [MessageCheckService, SupportUpdate],
+  providers: [MessageCheckService, SupportBotUpdate, UserUpdate, SupportUpdate],
 })
 export class SupportBotModule {}

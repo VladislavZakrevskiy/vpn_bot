@@ -4,9 +4,10 @@ import { UserService } from '../../../users/user/users.service';
 import { Role, Ticket, User } from '@prisma/client';
 import { TicketService } from '../../../tickets/tickets.service';
 import { MessageService } from '../../../messages/messages.service';
+import { escapeMarkdown } from 'src/bots/bot/core/helpers/escapeMarkdown';
 
 @Update()
-export class SupportUpdate {
+export class UserUpdate {
   constructor(
     private userService: UserService,
     private ticketService: TicketService,
@@ -30,7 +31,26 @@ export class SupportUpdate {
     }
   }
 
-  async onTextSupport(ctx: SessionSceneContext, user: User) {}
+  async onTextSupport(ctx: SessionSceneContext, user: User) {
+    const { current_ticket_id } = ctx.session;
+    if (!current_ticket_id) {
+      await ctx.reply(
+        escapeMarkdown(`Не выбран тикет, сначала выберите его
+\`\\ticket <id>\``),
+      );
+      return;
+    }
+    await this.messageService.createMessage({
+      sended: false,
+      text: ctx.text,
+      ticket: { connect: { id: current_ticket_id } },
+      type: 'TEXT',
+      user: { connect: { id: user.id } },
+    });
+    await ctx.reply(
+      'Ваше сообщение в обработке! Ожидайте ответа пользователя, вы можете попросить пользователя закрыть тикет с помощью команды \\close_ticket',
+    );
+  }
 
   async onTextUser(ctx: SessionSceneContext, user: User) {
     const tickets = await this.ticketService.getTickets(user.id, {
@@ -49,8 +69,6 @@ export class SupportUpdate {
       ticket: { connect: { id: ticket.id } },
       user: { connect: { id: user.id } },
     });
-    await ctx.reply(
-      'Ваше сообщение в обработке! Ожидайте работника службы поддержки',
-    );
+    await ctx.reply('Ваше сообщение в обработке! Ожидайте работника службы поддержки');
   }
 }

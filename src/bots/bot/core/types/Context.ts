@@ -5,6 +5,7 @@ import { SceneSessionData } from 'telegraf/typings/scenes';
 export interface SessionContext extends ContextTelegraf {
   session: {
     user: User;
+    current_ticket_id: string;
   };
 }
 

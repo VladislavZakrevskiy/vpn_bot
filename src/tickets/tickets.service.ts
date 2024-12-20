@@ -21,15 +21,20 @@ const min = <T>(array: T[], key: keyof T): T | undefined => {
 export class TicketService {
   constructor(private prisma: PrismaService) {}
 
+  async getTicket(ticket_id: string, include?: Prisma.TicketInclude) {
+    return await this.prisma.ticket.findUnique({
+      where: { id: ticket_id },
+      include,
+    });
+  }
+
   async getTickets(user_id: string, where: Prisma.TicketWhereInput) {
     const user = await this.prisma.user.findUnique({
       where: { id: user_id },
       include: { support_tickets: { where }, user_tickets: { where } },
     });
 
-    return user.role === Role.SUPPORT
-      ? user.support_tickets
-      : user.user_tickets;
+    return user.role === Role.SUPPORT ? user.support_tickets : user.user_tickets;
   }
 
   async addTicket(user_id: string) {

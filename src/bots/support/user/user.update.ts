@@ -1,11 +1,12 @@
-import { Ctx, InjectBot, On, Update } from 'nestjs-telegraf';
+import { Action, Ctx, InjectBot, On, Update } from 'nestjs-telegraf';
 import { SessionSceneContext } from 'src/bots/bot/core/types/Context';
 import { UserService } from '../../../users/user/users.service';
 import { Role, Ticket, User } from '@prisma/client';
 import { TicketService } from '../../../tickets/tickets.service';
 import { MessageService } from '../../../messages/messages.service';
-// import { escapeMarkdown } from 'src/bots/bot/core/helpers/escapeMarkdown';
 import { Telegraf } from 'telegraf';
+import { CallbackQuery } from 'telegraf/typings/core/types/typegram';
+import { escapeMarkdown } from 'src/bots/bot/core/helpers/escapeMarkdown';
 
 @Update()
 export class UserUpdate {
@@ -15,6 +16,22 @@ export class UserUpdate {
     private messageService: MessageService,
     @InjectBot('support') private readonly bot: Telegraf,
   ) {}
+
+  @Action(/^close_ticket_(.+)$/)
+  async close_ticket(@Ctx() ctx: SessionSceneContext) {
+    const ticket_id = (ctx.callbackQuery as CallbackQuery & { data: string }).data.split('_')[2];
+    const ticket = await this.ticketService.closeTicket(ticket_id);
+    await this.bot.telegram.sendMessage(
+      ticket.supporter.tg_id,
+      `Пользователь закрыл тикет\\!
+*Тикет от ${escapeMarkdown(ticket.created_at.toLocaleString())}:*
+\`${escapeMarkdown(ticket.id)}\`
+>${escapeMarkdown(ticket.messages[ticket.messages.length - 1].text)}`,
+      { parse_mode: 'MarkdownV2' },
+    );
+
+    await ctx.reply('Закрыли проблему! Если снова возникнут трудности, обращайтесь!');
+  }
 
   @On('text')
   async onText(@Ctx() ctx: SessionSceneContext) {

@@ -64,6 +64,7 @@ export class TicketService {
     return await this.prisma.ticket.update({
       where: { id },
       data: { status: 'CLOSE' },
+      include: { supporter: true, user: true, messages: { take: 1 } },
     });
   }
 }

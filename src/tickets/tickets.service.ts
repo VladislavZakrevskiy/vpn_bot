@@ -23,7 +23,7 @@ export class TicketService {
 
   async getTicket(ticket_id: string, include?: Prisma.TicketInclude) {
     return await this.prisma.ticket.findUnique({
-      where: { id: ticket_id },
+      where: { id: ticket_id, status: 'OPEN' },
       include,
     });
   }

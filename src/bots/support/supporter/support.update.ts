@@ -16,6 +16,24 @@ export class SupportUpdate {
     @InjectBot('support') private bot: Telegraf,
   ) {}
 
+  @Command('my_ticket')
+  async sendTicket(@Ctx() ctx: SessionSceneContext) {
+    const user = await this.userService.getUserByQuery({ tg_id: ctx.from.id.toString() });
+    if (user.role !== 'SUPPORT') {
+      return;
+    }
+
+    const { current_ticket_id } = ctx.session;
+    if (!current_ticket_id) [await ctx.reply('Тикет не выбран')];
+    const { created_at, messages, id } = await this.ticketService.getTicket(current_ticket_id, {
+      messages: { take: 1 },
+    });
+
+    await ctx.replyWithMarkdownV2(`*Тикет от ${escapeMarkdown(created_at.toLocaleString())}*
+\`${escapeMarkdown(id)}\`
+>${escapeMarkdown(messages[messages.length - 1]?.text || '')}`);
+  }
+
   @Command('message')
   async sendMessage(@Ctx() ctx: SessionSceneContext) {
     const user = await this.userService.getUserByQuery({ tg_id: ctx.from.id.toString() });
@@ -90,16 +108,15 @@ export class SupportUpdate {
 
   @Command('ticket')
   async chooseTicket(@Ctx() ctx: SessionSceneContext) {
-    const ticket_id = ctx.text.split(' ')[1];
-    if (!ticket_id) {
-      await ctx.reply(`Введите айди желаемого для выбора тикета!`);
-      return;
-    }
-
     const user = await this.userService.getUserByQuery({
       tg_id: ctx.from.id.toString(),
     });
     if (user.role !== 'SUPPORT') {
+      return;
+    }
+    const ticket_id = ctx.text.split(' ')[1];
+    if (!ticket_id) {
+      await ctx.reply(`Введите айди желаемого для выбора тикета!`);
       return;
     }
 
@@ -157,14 +174,16 @@ export class SupportUpdate {
 
   @Command('close_ticket')
   async closeTicket(@Ctx() ctx: SessionSceneContext) {
+    const user = await this.userService.getUserByQuery({ tg_id: ctx.from.id.toString() });
+    if (user.role !== 'SUPPORT') {
+      return;
+    }
+
     const { current_ticket_id } = ctx.session;
     if (!current_ticket_id) {
       await ctx.reply('Не выбран тикет! Выберите его в /tickets либо командой /ticket <ID>');
       return;
     }
-    const user = await this.userService.getUserByQuery({
-      tg_id: ctx.from.id.toString(),
-    });
 
     await this.messageService.createMessage({
       sended: false,

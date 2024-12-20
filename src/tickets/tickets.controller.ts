@@ -25,7 +25,7 @@ export class TicketController {
       );
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      return supports.map(({ support_tickets }) => support_tickets);
+      return supports.map(({ support_tickets }) => support_tickets).flat();
     } else {
       const supports = await this.userService.getUsersByQuery(
         { role: 'SUPPORT' },
@@ -33,7 +33,7 @@ export class TicketController {
       );
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      return supports.map(({ support_tickets }) => support_tickets);
+      return supports.map(({ support_tickets }) => support_tickets).flat();
     }
   }
 

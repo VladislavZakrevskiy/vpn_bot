@@ -29,7 +29,12 @@ export class MessageCheckService {
       if (message.type === 'TEXT') {
         await this.bot.telegram.sendMessage(
           sender_id.id,
-          `${sender_id.type === 'user' ? '*Сообщение от пользователя, номер тикета:*' + `\`\`\`${message.id}\`\`\`` : '*Сообщение от работника поддержки:*'}
+          `${
+            sender_id.type === 'user'
+              ? `*Сообщение от пользователя, номер тикета:*
+\`${message.ticket_id}\``
+              : '*Сообщение от работника поддержки:*'
+          }
 >${message.text}`,
           { parse_mode: 'MarkdownV2' },
         );

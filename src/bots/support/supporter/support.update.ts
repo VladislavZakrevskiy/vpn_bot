@@ -18,6 +18,11 @@ export class SupportUpdate {
 
   @Command('message')
   async sendMessage(@Ctx() ctx: SessionSceneContext) {
+    const user = await this.userService.getUserByQuery({ tg_id: ctx.from.id.toString() });
+    if (user.role !== 'SUPPORT') {
+      return;
+    }
+
     const text = ctx.text.split(' ');
     text.splice(0, 1);
     const messageText = text.join(' ');
@@ -48,9 +53,11 @@ export class SupportUpdate {
 
   @Command('tickets')
   async sendTicketList(@Ctx() ctx: SessionSceneContext) {
-    const user = await this.userService.getUserByQuery({
-      tg_id: ctx.from.id.toString(),
-    });
+    const user = await this.userService.getUserByQuery({ tg_id: ctx.from.id.toString() });
+    if (user.role !== 'SUPPORT') {
+      return;
+    }
+
     const tickets = await this.ticketService.getTickets(user.id, { status: 'OPEN' }, { messages: { take: 1 } });
     const pagination = new Pagination({
       data: tickets,
@@ -88,13 +95,14 @@ export class SupportUpdate {
       await ctx.reply(`Введите айди желаемого для выбора тикета!`);
       return;
     }
+
     const user = await this.userService.getUserByQuery({
       tg_id: ctx.from.id.toString(),
     });
     if (user.role !== 'SUPPORT') {
-      await ctx.reply(`Вы не работник поддержки, эта команда вам недоступна!`);
       return;
     }
+
     const ticket = await this.ticketService.getTicket(ticket_id);
     if (!ticket) {
       await ctx.reply(`Такого тикета не существует! Проверьте на правильность введенную команду`);
@@ -111,11 +119,17 @@ export class SupportUpdate {
 
   @Command('history')
   async getTicketMessages(@Ctx() ctx: SessionSceneContext) {
+    const user = await this.userService.getUserByQuery({ tg_id: ctx.from.id.toString() });
+    if (user.role !== 'SUPPORT') {
+      return;
+    }
+
     const { current_ticket_id } = ctx.session;
     if (!current_ticket_id) {
       await ctx.reply('Не выбран тикет! Выберите его в /tickets либо командой /ticket <ID>');
       return;
     }
+
     const { messages, supporter_id } = await this.ticketService.getTicket(current_ticket_id, {
       messages: true,
     });

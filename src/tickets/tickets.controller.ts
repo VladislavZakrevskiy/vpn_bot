@@ -34,7 +34,7 @@ export class TicketController {
       const vpnUser = await this.vpnAdminService.getUser(user.vpn_uuid);
 
       tickets[i].supporter = { ...tickets[i].supporter, vpn: vpnSupport.data as VpnUser };
-      tickets[i].user = { ...tickets[i].supporter, vpn: vpnUser.data as VpnUser };
+      tickets[i].user = { ...tickets[i].user, vpn: vpnUser.data as VpnUser };
     }
 
     return tickets;

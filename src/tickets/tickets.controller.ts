@@ -2,7 +2,7 @@ import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
 import { TicketService } from './tickets.service';
 import { UserService } from '../users/user/users.service';
 import { VpnAdminService } from '../vpn/services/vpn.admin.service';
-import { User } from '@prisma/client';
+import { Ticket, User } from '@prisma/client';
 import { User as VpnUser } from 'src/vpn/types/User';
 import { JwtAuthGuard } from 'src/core/decorators/JwtAuth';
 
@@ -23,17 +23,27 @@ export class TicketController {
         { role: 'SUPPORT', id: { in: supportIds } },
         { support_tickets: { include: { supporter: true, user: true } } },
       );
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      return supports.map(({ support_tickets }) => support_tickets).flat();
+      const vpnUsers: (User & { vpn: VpnUser; support_tickets: Ticket[] })[] = [];
+      for (const support of supports) {
+        const vpnUser = await this.vpnAdminService.getUser(support.vpn_uuid);
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        vpnUsers.push({ ...support, vpn: vpnUser.data });
+      }
+      return vpnUsers.map(({ support_tickets }) => support_tickets).flat();
     } else {
       const supports = await this.userService.getUsersByQuery(
         { role: 'SUPPORT' },
         { support_tickets: { include: { supporter: true, user: true } } },
       );
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      return supports.map(({ support_tickets }) => support_tickets).flat();
+      const vpnUsers: (User & { vpn: VpnUser; support_tickets: Ticket[] })[] = [];
+      for (const support of supports) {
+        const vpnUser = await this.vpnAdminService.getUser(support.vpn_uuid);
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        vpnUsers.push({ ...support, vpn: vpnUser.data });
+      }
+      return vpnUsers.map(({ support_tickets }) => support_tickets).flat();
     }
   }
 

@@ -98,11 +98,10 @@ export class UserService {
   }
 
   async getUsersByQuery(query: Prisma.UserWhereInput, include?: Prisma.UserInclude): Promise<User[]> {
-    const users = await this.prisma.user.findMany({
+    return await this.prisma.user.findMany({
       where: query,
       include,
     });
-    return users;
   }
 
   async getUsersWithPurchaseByQuery(query: Prisma.UserWhereInput) {

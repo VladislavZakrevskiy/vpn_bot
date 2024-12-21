@@ -1,4 +1,4 @@
-import { Action, Command, Ctx, Hears, InjectBot, Start, Update } from 'nestjs-telegraf';
+import { Action, Ctx, Hears, InjectBot, Start, Update } from 'nestjs-telegraf';
 import { getStartText } from './texts/getStartText';
 import { TgUser } from './decorators/TgUser';
 import { TelegramUser } from './types/TelegramUser';
@@ -45,37 +45,6 @@ export class BotCoreUpdate {
     );
   }
 
-  @Command('test')
-  async onTest(@Ctx() ctx: SessionSceneContext) {
-    await ctx.replyWithMarkdownV2(`*bold text*
-_italic text_
-__underline__
-~strikethrough~
-||spoiler||
-*bold _italic bold ~italic bold strikethrough ||italic bold strikethrough spoiler||~ __underline italic bold___ bold*
-[inline URL](http://www.example.com/)
-[inline mention of a user](tg://user?id=123456789)
-![👍](tg://emoji?id=5368324170671202286)
-\`inline fixed-width code\`
-\`\`\`
-pre-formatted fixed-width code block
-\`\`\`
-\`\`\`python
-pre-formatted fixed-width code block written in the Python programming language
-\`\`\`
->Block quotation started
->Block quotation continued
->Block quotation continued
->Block quotation continued
->The last line of the block quotation
-**>The expandable block quotation started right after the previous block quotation
->It is separated from the previous block quotation by an empty bold entity
->Expandable block quotation continued
->Hidden by default part of the expandable block quotation started
->Expandable block quotation continued
->The last line of the expandable block quotation with the expandability mark||`);
-  }
-
   @Start()
   async start(@Ctx() ctx: SessionSceneContext, @TgUser() user: TelegramUser) {
     const dbUser = await this.userService.getUserByQuery({
@@ -101,6 +70,7 @@ pre-formatted fixed-width code block written in the Python programming language
         [Markup.button.callback('🛒 Список тарифов', 'rate_list')],
         [Markup.button.callback('👤 Профиль', 'profile')],
         [Markup.button.callback('🗣 Поддержка', 'support')],
+        [Markup.button.callback('❓FaQ', 'questions')],
       ]).resize(),
     );
     await this.rateUpdate.handleRateList(ctx);
@@ -191,5 +161,18 @@ pre-formatted fixed-width code block written in the Python programming language
     const text = await pagination.text();
     const keyboard = await pagination.keyboard();
     await ctx.replyWithMarkdownV2(text, { ...keyboard, parse_mode: 'HTML' });
+  }
+
+  @Hears('❓FaQ')
+  async sendQuestions(@Ctx() ctx: SessionSceneContext) {
+    await ctx.replyWithMarkdownV2(`*Часто задаваемые вопросы:* 
+>Вопрос
+_Ответ_
+>Вопрос
+_Ответ_
+>Вопрос
+_Ответ_
+>Вопрос
+_Ответ_`);
   }
 }

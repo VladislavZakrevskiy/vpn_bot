@@ -21,7 +21,6 @@ export class UserController {
     for (const user of users) {
       try {
         const vpnUser = await this.vpnAdminService.getUser(user.vpn_uuid);
-        console.log(user, vpnUser);
         if (vpnUser.status === 404) {
           await this.userService.deleteUser({ id: user.id });
         } else {

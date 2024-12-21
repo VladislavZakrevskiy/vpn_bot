@@ -1,5 +1,6 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { InjectBot } from 'nestjs-telegraf';
+import { escapeMarkdown } from 'src/bots/bot/core/helpers/escapeMarkdown';
 import { PrismaService } from 'src/db/prisma.service';
 import { Telegraf } from 'telegraf';
 
@@ -18,7 +19,7 @@ export class MailingController {
       const users = await this.prisma.user.findMany({});
       for (const user of users) {
         try {
-          await this.bot.telegram.sendMessage(user.tg_id, msg);
+          await this.bot.telegram.sendMessage(user.tg_id, escapeMarkdown(msg), { parse_mode: 'MarkdownV2' });
         } catch (e) {
           console.log(e);
         }

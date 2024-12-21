@@ -18,33 +18,26 @@ export class TicketController {
   @Get('tickets')
   async getTickets(@Query('ids') ids: string) {
     const supportIds = ids?.split('/\\');
-    if (supportIds && supportIds.length !== 0) {
-      const supports = await this.userService.getUsersByQuery(
-        { role: 'SUPPORT', id: { in: supportIds } },
-        { support_tickets: { include: { supporter: true, user: true } } },
-      );
-      const vpnUsers: (User & { vpn: VpnUser; support_tickets: Ticket[] })[] = [];
-      for (const support of supports) {
-        const vpnUser = await this.vpnAdminService.getUser(support.vpn_uuid);
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        vpnUsers.push({ ...support, vpn: vpnUser.data });
-      }
-      return vpnUsers.map(({ support_tickets }) => support_tickets).flat();
-    } else {
-      const supports = await this.userService.getUsersByQuery(
-        { role: 'SUPPORT' },
-        { support_tickets: { include: { supporter: true, user: true } } },
-      );
-      const vpnUsers: (User & { vpn: VpnUser; support_tickets: Ticket[] })[] = [];
-      for (const support of supports) {
-        const vpnUser = await this.vpnAdminService.getUser(support.vpn_uuid);
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        vpnUsers.push({ ...support, vpn: vpnUser.data });
-      }
-      return vpnUsers.map(({ support_tickets }) => support_tickets).flat();
+    const supports = await this.userService.getUsersByQuery(
+      { role: 'SUPPORT', id: supportIds && supportIds.length !== 0 ? { in: supportIds } : undefined },
+      { support_tickets: { include: { supporter: true, user: true } } },
+    );
+    const tickets: (Ticket & { supporter: User & { vpn: VpnUser }; user: User & { vpn: VpnUser } })[] = supports
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      .map(({ support_tickets }) => support_tickets)
+      .flat();
+
+    for (let i = 0; i < tickets.length; i++) {
+      const { supporter, user } = tickets[i];
+      const vpnSupport = await this.vpnAdminService.getUser(supporter.vpn_uuid);
+      const vpnUser = await this.vpnAdminService.getUser(user.vpn_uuid);
+
+      tickets[i].supporter = { ...tickets[i].supporter, vpn: vpnSupport.data as VpnUser };
+      tickets[i].user = { ...tickets[i].supporter, vpn: vpnUser.data as VpnUser };
     }
+
+    return tickets;
   }
 
   @UseGuards(JwtAuthGuard)

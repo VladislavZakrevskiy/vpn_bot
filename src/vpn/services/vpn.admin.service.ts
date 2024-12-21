@@ -24,94 +24,64 @@ export class VpnAdminService {
 
   async getAllAdmins() {
     const url = await this.getUrl();
-    const res = await lastValueFrom(
-      this.httpService.get<Admin[]>(`${url}/admin/admin_user/`),
-    );
+    const res = await lastValueFrom(this.httpService.get<Admin[]>(`${url}/admin/admin_user/`));
     return res.data;
   }
 
   async createAdmin(createData: Admin) {
     const url = await this.getUrl();
-    const res = await lastValueFrom(
-      this.httpService.post<Admin, Admin>(
-        `${url}/admin/admin_user/`,
-        createData,
-      ),
-    );
+    const res = await lastValueFrom(this.httpService.post<Admin, Admin>(`${url}/admin/admin_user/`, createData));
     return res.data;
   }
 
   async deleteAdmin(id: string) {
     const url = await this.getUrl();
-    const res = await lastValueFrom(
-      this.httpService.delete<Admin>(`${url}/admin/admin_user/${id}`),
-    );
+    const res = await lastValueFrom(this.httpService.delete<Admin>(`${url}/admin/admin_user/${id}`));
     return res.data;
   }
 
   async getAdmin(id: string) {
     const url = await this.getUrl();
-    const res = await lastValueFrom(
-      this.httpService.get<Admin>(`${url}/admin/admin_user/${id}`),
-    );
+    const res = await lastValueFrom(this.httpService.get<Admin>(`${url}/admin/admin_user/${id}`));
     return res.data;
   }
 
   async updateAdmin(id: string, updateData: Partial<Admin>) {
     const url = await this.getUrl();
     const res = await lastValueFrom(
-      this.httpService.patch<Admin, Partial<Admin>>(
-        `${url}/admin/admin_user/${id}`,
-        updateData,
-      ),
+      this.httpService.patch<Admin, Partial<Admin>>(`${url}/admin/admin_user/${id}`, updateData),
     );
     return res.data;
   }
 
   async getAdminUsers() {
     const url = await this.getUrl();
-    const res = await lastValueFrom(
-      this.httpService.get<User[]>(`${url}/admin/user/`),
-    );
+    const res = await lastValueFrom(this.httpService.get<User[]>(`${url}/admin/user/`));
     return res.data;
   }
 
   async createUser(createData: Partial<User>) {
     const url = await this.getUrl();
-    const res = await lastValueFrom(
-      this.httpService.post<User, Partial<User>>(
-        `${url}/admin/user/`,
-        createData,
-      ),
-    );
+    const res = await lastValueFrom(this.httpService.post<User, Partial<User>>(`${url}/admin/user/`, createData));
     return res.data;
   }
 
   async deleteUser(id: string) {
     const url = await this.getUrl();
-    const res = await lastValueFrom(
-      this.httpService.delete<User>(`${url}/admin/user/${id}`),
-    );
+    const res = await lastValueFrom(this.httpService.delete<User>(`${url}/admin/user/${id}`));
     return res.data;
   }
 
   async updateUser(id: string, updateData: Partial<User>) {
     const url = await this.getUrl();
-    const res = await lastValueFrom(
-      this.httpService.patch<User, Partial<User>>(
-        `${url}/admin/user/${id}`,
-        updateData,
-      ),
-    );
+    const res = await lastValueFrom(this.httpService.patch<User, Partial<User>>(`${url}/admin/user/${id}`, updateData));
     return res.data;
   }
 
   async getUser(id: string) {
     try {
       const url = await this.getUrl();
-      const res = await lastValueFrom(
-        this.httpService.get<User, Partial<User>>(`${url}/admin/user/${id}`),
-      );
+      const res = await lastValueFrom(this.httpService.get<User, Partial<User>>(`${url}/admin/user/${id}`));
       return { data: res.data, status: res.status };
     } catch (error) {
       return { data: null, status: error.status || 404 };

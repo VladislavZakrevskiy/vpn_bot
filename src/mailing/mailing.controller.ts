@@ -13,7 +13,8 @@ export class MailingController {
   @Post('')
   async sendMessagers(@Body() body: { msg: string; ids: string[] }) {
     const { ids, msg } = body;
-    if ('all_users' in ids) {
+
+    if (ids.find((val) => val === 'all_users')) {
       const users = await this.prisma.user.findMany({});
       for (const user of users) {
         try {

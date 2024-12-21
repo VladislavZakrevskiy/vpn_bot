@@ -14,7 +14,6 @@ export class TicketController {
     private vpnAdminService: VpnAdminService,
   ) {}
 
-  @UseGuards(JwtAuthGuard)
   @Get('tickets')
   async getTickets(@Query('ids') ids: string) {
     const supportIds = ids?.split('/\\');
@@ -56,6 +55,18 @@ export class TicketController {
   @Get('/ticket/:id')
   async getTicket(@Param('id') id: string) {
     const ticket = await this.ticketService.getTicket(id, { messages: true, supporter: true, user: true });
+
+    const { supporter, user } = ticket;
+    const vpnSupport = await this.vpnAdminService.getUser(supporter.vpn_uuid);
+    const vpnUser = await this.vpnAdminService.getUser(user.vpn_uuid);
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    ticket.supporter = { ...ticket.supporter, vpn: vpnSupport.data as VpnUser };
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    ticket.user = { ...ticket.user, vpn: vpnUser.data as VpnUser };
+
     return ticket;
   }
 }

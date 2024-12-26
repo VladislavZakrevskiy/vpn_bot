@@ -8,9 +8,10 @@ import { SupportBotUpdate } from './core/support.update';
 import { UserUpdate } from './user/user.update';
 import { SupportUpdate } from './supporter/support.update';
 import { ScheduleModule } from '@nestjs/schedule';
+import { PrismaService } from 'src/db/prisma.service';
 
 @Module({
   imports: [MessageModule, TicketModule, UserModule, VpnModule, ScheduleModule.forRoot()],
-  providers: [MessageCheckService, SupportUpdate, SupportBotUpdate, UserUpdate],
+  providers: [MessageCheckService, PrismaService, SupportUpdate, SupportBotUpdate, UserUpdate],
 })
 export class SupportBotModule {}

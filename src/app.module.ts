@@ -7,6 +7,7 @@ import { TelegrafModule } from 'nestjs-telegraf';
 import { session } from 'telegraf';
 import { SupportBotModule } from './bots/support/support.module';
 import { BotModule } from './bots/bot/bot.module';
+import { TagsModule } from './tags/tags.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { BotModule } from './bots/bot/bot.module';
       botName: 'support',
       include: [SupportBotModule],
     }),
+    SupportBotModule,
     // Main TG Bot
     TelegrafModule.forRoot({
       token: process.env.TELEGRAM_BOT_TOKEN,
@@ -24,16 +26,16 @@ import { BotModule } from './bots/bot/bot.module';
       include: [BotModule],
       botName: 'main',
     }),
-    PrismaModule,
+    BotModule,
     HttpModule.register({
       baseURL: process.env.VPN_URL,
       global: true,
       headers: { 'Hiddify-API-Key': process.env.PROXY_API_TOKEN },
     }),
+    PrismaModule,
     SettingsModule,
     MailingModule,
-    BotModule,
-    SupportBotModule,
+    TagsModule,
   ],
   providers: [],
 })

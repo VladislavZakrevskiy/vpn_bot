@@ -8,15 +8,18 @@ datasource db {
 }
 
 model Settings {
-  id               String   @id @unique @default(uuid()) @db.Uuid
-  admin_proxy_path String
-  user_proxy_path  String
-  crypto_types     String[]
-  max_sert         Int      @default(3)
-  admin_command    String[] @default(["admin"])
-  is_cart_enable   Boolean  @default(true)
-  is_star_enable   Boolean  @default(true)
-  is_crypto_enable Boolean  @default(true)
+  id                       String   @id @unique @default(uuid()) @db.Uuid
+  admin_proxy_path         String
+  user_proxy_path          String
+  crypto_types             String[]
+  max_sert                 Int      @default(3)
+  admin_command            String[] @default(["admin"])
+  is_cart_enable           Boolean  @default(true)
+  is_star_enable           Boolean  @default(true)
+  is_crypto_enable         Boolean  @default(true)
+  tp_hello_message         String   @default("Привет")
+  tp_close_support_message String   @default("Конец саппорт")
+  tp_close_user_message    String   @default("Конец юзер")
 }
 
 model User {
@@ -41,6 +44,7 @@ model Ticket {
   user_id      String    @db.Uuid
   supporter    User      @relation(fields: [supporter_id], references: [id], name: "support")
   user         User      @relation(fields: [user_id], references: [id], name: "user")
+  tags         Tag[]
 }
 
 model Message {
@@ -49,12 +53,12 @@ model Message {
   type       MessageType
   created_at DateTime    @default(now())
   sended     Boolean
-  
-  user_id    String      @db.Uuid
-  user       User        @relation(fields: [user_id], references: [id])
 
-  ticket_id  String      @db.Uuid
-  ticket     Ticket      @relation(fields: [ticket_id], references: [id])
+  user_id String @db.Uuid
+  user    User   @relation(fields: [user_id], references: [id])
+
+  ticket_id String @db.Uuid
+  ticket    Ticket @relation(fields: [ticket_id], references: [id])
 }
 
 model Purchase {
@@ -83,6 +87,12 @@ model Rate {
   MB_speed    Int
   expiresIn   Int
   purchases   Purchase[]
+}
+
+model Tag {
+  id      String   @id @default(uuid()) @db.Uuid
+  value   String
+  tickets Ticket[]
 }
 
 enum Status {

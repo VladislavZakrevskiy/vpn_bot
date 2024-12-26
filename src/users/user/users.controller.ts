@@ -1,6 +1,6 @@
-import { Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { User as VpnUser } from 'src/vpn/types/User';
-import { User } from '@prisma/client';
+import { Role, User } from '@prisma/client';
 import { JwtAuthGuard } from 'src/core/decorators/JwtAuth';
 import { UserService } from './users.service';
 import { VpnAdminService } from 'src/vpn/services/vpn.admin.service';
@@ -42,6 +42,12 @@ export class UserController {
     const vpnUser = await this.vpnAdminService.deleteUser(user.vpn_uuid);
 
     return { ...user, vpn: vpnUser };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('/role')
+  async switchRole(@Body() { role, id }: { role: Role; id: string }) {
+    return await this.userService.updateUser({ id }, { role });
   }
 
   @UseGuards(JwtAuthGuard)

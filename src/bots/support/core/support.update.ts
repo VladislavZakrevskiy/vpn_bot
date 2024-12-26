@@ -6,6 +6,7 @@ import { Role } from '@prisma/client';
 import { getSupportText } from './texts/getSupportText';
 import { Telegraf } from 'telegraf';
 import { getHelpText } from './texts/getHelpText';
+import { PrismaService } from 'src/db/prisma.service';
 
 @Update()
 export class SupportBotUpdate {
@@ -13,6 +14,7 @@ export class SupportBotUpdate {
     private userService: UserService,
     private vpnAdminService: VpnAdminService,
     @InjectBot('support') private readonly bot: Telegraf,
+    private prisma: PrismaService,
   ) {}
 
   @Command('help')
@@ -46,6 +48,8 @@ export class SupportBotUpdate {
       });
     }
 
+    const settings = await this.prisma.settings.findFirst({});
+
     switch (user.role) {
       case Role.SUPPORT:
         await ctx.replyWithMarkdownV2(getSupportText());
@@ -53,7 +57,8 @@ export class SupportBotUpdate {
 
       case Role.USER:
       case Role.ADMIN:
-        await ctx.replyWithMarkdownV2(`Здравствуйте, какая у вас возникла проблема?`);
+        await ctx.replyWithMarkdownV2(settings.tp_hello_message);
+        // Здравствуйте, какая у вас возникла проблема?
         break;
     }
   }

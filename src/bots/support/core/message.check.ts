@@ -41,7 +41,7 @@ export class MessageCheckService {
       } else {
         await this.bot.telegram.sendMessage(sender_id.id, escapeMarkdown(`${message.text}`), {
           reply_markup: {
-            inline_keyboard: [[{ callback_data: 'close_ticket_' + message.ticket_id, text: 'Закрыть проблему' }]],
+            inline_keyboard: [[{ callback_data: 'close_ticket_' + message.ticket_id, text: 'Вопрос решен ✅' }]],
           },
         });
       }

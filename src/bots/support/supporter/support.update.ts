@@ -6,6 +6,7 @@ import { UserService } from 'src/users/user/users.service';
 import { Pagination } from '@vladislav_zakrevskiy/telegraf-pagination';
 import { Telegraf } from 'telegraf';
 import { escapeMarkdown } from 'src/bots/bot/core/helpers/escapeMarkdown';
+import { PrismaService } from 'src/db/prisma.service';
 
 @Update()
 export class SupportUpdate {
@@ -13,6 +14,7 @@ export class SupportUpdate {
     private ticketService: TicketService,
     private userService: UserService,
     private messageService: MessageService,
+    private prisma: PrismaService,
     @InjectBot('support') private bot: Telegraf,
   ) {}
 
@@ -193,13 +195,16 @@ export class SupportUpdate {
       return;
     }
 
+    const settings = await this.prisma.settings.findFirst();
     await this.messageService.createMessage({
       sended: false,
-      text: 'Оператор предлагает закрыть проблему, согласны?',
+      text: settings.tp_close_user_message,
+      // Оператор предлагает закрыть проблему, согласны?
       ticket: { connect: { id: current_ticket_id } },
       type: 'CLOSE',
       user: { connect: { id: user.id } },
     });
-    await ctx.reply('Отправили пользователю запрос на закрытие тикета! Ожидайsте!');
+    await ctx.reply(settings.tp_close_support_message);
+    // 'Отправили пользователю запрос на закрытие тикета! Ожидайsте!'
   }
 }

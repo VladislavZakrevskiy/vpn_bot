@@ -16,14 +16,8 @@ export class AuthController {
     const data = dataCheckString.split('=');
     const tg_user = JSON.parse(data[data.length - 1]);
 
-    const secretKey = crypto
-      .createHmac('sha256', 'WebAppData')
-      .update(process.env.TELEGRAM_BOT_TOKEN)
-      .digest();
-    const calculatedHash = crypto
-      .createHmac('sha256', secretKey)
-      .update(dataCheckString)
-      .digest('hex');
+    const secretKey = crypto.createHmac('sha256', 'WebAppData').update(process.env.TELEGRAM_BOT_TOKEN).digest();
+    const calculatedHash = crypto.createHmac('sha256', secretKey).update(dataCheckString).digest('hex');
 
     const user = await this.userService.getUserByQuery({
       tg_id: String(tg_user.id),

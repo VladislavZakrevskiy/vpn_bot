@@ -19,7 +19,7 @@ export class TicketController {
     const supportIds = ids?.split('/\\');
     const supports = await this.userService.getUsersByQuery(
       { role: 'SUPPORT', id: supportIds && supportIds.length !== 0 ? { in: supportIds } : undefined },
-      { support_tickets: { include: { supporter: true, user: true } } },
+      { support_tickets: { include: { supporter: true, user: true, tag: true } } },
     );
     const tickets: (Ticket & { supporter: User & { vpn: VpnUser }; user: User & { vpn: VpnUser } })[] = supports
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -54,7 +54,7 @@ export class TicketController {
   @UseGuards(JwtAuthGuard)
   @Get('/ticket/:id')
   async getTicket(@Param('id') id: string) {
-    const ticket = await this.ticketService.getTicket(id, { messages: true, supporter: true, user: true });
+    const ticket = await this.ticketService.getTicket(id, { messages: true, supporter: true, user: true, tag: true });
 
     const { supporter, user } = ticket;
     const vpnSupport = await this.vpnAdminService.getUser(supporter.vpn_uuid);

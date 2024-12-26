@@ -19,7 +19,7 @@ export class TicketController {
     const supportIds = ids?.split('/\\');
     const supports = await this.userService.getUsersByQuery(
       { role: 'SUPPORT', id: supportIds && supportIds.length !== 0 ? { in: supportIds } : undefined },
-      { support_tickets: { include: { supporter: true, user: true, tag: true } } },
+      { support_tickets: { include: { supporter: true, user: true, tag: true }, orderBy: { created_at: 'asc' } } },
     );
     const tickets: (Ticket & { supporter: User & { vpn: VpnUser }; user: User & { vpn: VpnUser } })[] = supports
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment

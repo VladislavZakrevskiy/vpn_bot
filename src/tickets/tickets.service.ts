@@ -28,6 +28,10 @@ export class TicketService {
     });
   }
 
+  async setTagToTicket(ticket_id: string, tag_id: number) {
+    return await this.prisma.ticket.update({ where: { id: ticket_id }, data: { tag: { connect: { id: tag_id } } } });
+  }
+
   async getAllTickets(where?: Prisma.TicketWhereInput, include?: Prisma.TicketInclude) {
     return await this.prisma.ticket.findMany({ where, include });
   }

@@ -10,15 +10,15 @@ export class TagsService {
     return await this.prisma.tag.create({ data: { value } });
   }
 
-  async removeTag(id: string) {
+  async removeTag(id: number) {
     return await this.prisma.tag.delete({ where: { id } });
   }
 
-  async updateTag({ id, value }: { id: string; value: string }) {
+  async updateTag({ id, value }: { id: number; value: string }) {
     return await this.prisma.tag.update({ where: { id }, data: { value } });
   }
 
-  async updateTags(data: [id: string, value: string][]) {
+  async updateTags(data: [id: number, value: string][]) {
     const updatedTags: Tag[] = [];
     for (const [id, value] of data) {
       updatedTags.push(await this.updateTag({ id, value }));

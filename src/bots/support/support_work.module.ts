@@ -10,6 +10,6 @@ import { SupportWorkBot } from './core/support_work.update';
 
 @Module({
   imports: [MessageModule, TicketModule, UserModule, VpnModule, ScheduleModule.forRoot()],
-  providers: [SupportUpdate, PrismaService, SupportWorkBot],
+  providers: [SupportWorkBot, SupportUpdate, PrismaService],
 })
 export class SupportWorkModule {}

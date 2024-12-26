@@ -7,10 +7,13 @@ import { escapeMarkdown } from 'src/bots/bot/core/helpers/escapeMarkdown';
 import { getMessageText } from './texts/getMessageText';
 import { TicketService } from 'src/tickets/tickets.service';
 import * as dayjs from 'dayjs';
+import { InlineKeyboardButton } from 'telegraf/typings/core/types/typegram';
+import { PrismaService } from 'src/db/prisma.service';
 
 @Injectable()
 export class MessageCheckService {
   constructor(
+    private prisma: PrismaService,
     private messageService: MessageService,
     private ticketService: TicketService,
     @InjectBot('support') private bot: Telegraf,
@@ -21,7 +24,7 @@ export class MessageCheckService {
   async sendMessages() {
     const messages = await this.messageService.getMessagesByQuery(
       { sended: false },
-      { ticket: { include: { supporter: true, user: true } } },
+      { ticket: { include: { supporter: true, user: true, tag: true } } },
     );
 
     for (const message of messages) {
@@ -38,16 +41,38 @@ export class MessageCheckService {
       let current_message_id: string;
       if (message.type === 'TEXT') {
         if (sender_id.type === 'user') {
+          // KeyBoard
+          const keyboard: InlineKeyboardButton[][] = [
+            [{ callback_data: 'choose_ticket_' + message.ticket_id, text: 'Выбрать этот тикет' }],
+          ];
+          if (!message.ticket.tag_id) {
+            const tags = await this.prisma.tag.findMany();
+            for (const tag of tags) {
+              if (keyboard.length < 2) {
+                keyboard.push([{ callback_data: `tag_${message.ticket_id}_${tag.id}`, text: tag.value }]);
+              } else {
+                if (keyboard[keyboard.length - 1].length >= 5) {
+                  keyboard.push([{ callback_data: `tag_${message.ticket_id}_${tag.id}`, text: tag.value }]);
+                } else {
+                  keyboard[keyboard.length - 1].push({
+                    callback_data: `tag_${message.ticket_id}_${tag.id}`,
+                    text: tag.value,
+                  });
+                }
+              }
+            }
+          }
+          // Send Message
           try {
             const { message_id } = await this.workBot.telegram.sendMessage(
               sender_id.id,
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
               getMessageText(message, 'support'),
               {
                 parse_mode: 'MarkdownV2',
                 reply_markup: {
-                  inline_keyboard: [
-                    [{ callback_data: 'choose_ticket_' + message.ticket_id, text: 'Выбрать этот тикет' }],
-                  ],
+                  inline_keyboard: keyboard,
                 },
               },
             );
@@ -57,6 +82,8 @@ export class MessageCheckService {
           }
         } else {
           try {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
             const { message_id } = await this.bot.telegram.sendMessage(sender_id.id, getMessageText(message, 'user'), {
               parse_mode: 'MarkdownV2',
             });

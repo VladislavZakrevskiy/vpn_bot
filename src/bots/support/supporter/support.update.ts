@@ -19,6 +19,25 @@ export class SupportUpdate {
     @InjectBot('support') private bot: Telegraf,
   ) {}
 
+  @Action(/^tag_(.+)$/)
+  async choose_tag(@Ctx() ctx: SessionSceneContext) {
+    const ticket_id = (ctx.callbackQuery as CallbackQuery & { data: string }).data.split('_')[1];
+    const tag_id = (ctx.callbackQuery as CallbackQuery & { data: string }).data.split('_')[2];
+
+    const ticket = await this.ticketService.getTicket(ticket_id, { tag: true }, 'OPEN');
+    const tag = await this.prisma.tag.findUnique({ where: { id: Number(tag_id) } });
+    if (!ticket) {
+      await ctx.reply(`Такого тикета не существует! Проверьте на правильность введенную команду`);
+      return;
+    }
+    if (!tag) {
+      await ctx.reply('Такого тега не существует');
+      return;
+    }
+    await this.ticketService.setTagToTicket(ticket_id, Number(tag_id));
+    await ctx.reply('Выбран тег для тикета!');
+  }
+
   @Action(/^choose_ticket_(.+)$/)
   async choose_ticket(@Ctx() ctx: SessionSceneContext) {
     const ticket_id = (ctx.callbackQuery as CallbackQuery & { data: string }).data.split('_')[2];
@@ -28,7 +47,7 @@ export class SupportUpdate {
       return;
     }
 
-    const ticket = await this.ticketService.getTicket(ticket_id, undefined, 'OPEN');
+    const ticket = await this.ticketService.getTicket(ticket_id, { tag: true }, 'OPEN');
     if (!ticket) {
       await ctx.reply(`Такого тикета не существует! Проверьте на правильность введенную команду`);
       return;
@@ -36,9 +55,10 @@ export class SupportUpdate {
 
     ctx.session.current_ticket_id = ticket_id;
     await ctx.replyWithMarkdownV2(
-      escapeMarkdown(`Выбран токен! 
-*Токен от ${ticket.created_at.toLocaleString()}:* 
-\`${ticket.id}\``),
+      escapeMarkdown(`Выбран тикет! 
+*Тикет от ${ticket.created_at.toLocaleString()}:* 
+\`${ticket.id}\`
+\`${escapeMarkdown(ticket.tag.value)}\``),
     );
   }
 
@@ -68,9 +88,10 @@ export class SupportUpdate {
 
     const { current_ticket_id } = ctx.session;
     if (!current_ticket_id) [await ctx.reply('Тикет не выбран')];
-    const { created_at, messages, id } = await this.ticketService.getTicket(
+    const { created_at, messages, id, tag } = await this.ticketService.getTicket(
       current_ticket_id,
       {
+        tag: true,
         messages: { take: 1 },
       },
       'OPEN',
@@ -78,7 +99,8 @@ export class SupportUpdate {
 
     await ctx.replyWithMarkdownV2(`*Тикет от ${escapeMarkdown(created_at.toLocaleString())}*
 \`${escapeMarkdown(id)}\`
->${escapeMarkdown(messages[messages.length - 1]?.text || '')}`);
+>${escapeMarkdown(messages[messages.length - 1]?.text || '')}
+\`${escapeMarkdown(tag.value)}\``);
   }
 
   @Command('tickets')
@@ -88,20 +110,26 @@ export class SupportUpdate {
       return;
     }
 
-    const tickets = await this.ticketService.getTickets(user.id, { status: 'OPEN' }, { messages: { take: 1 } });
+    const tickets = await this.ticketService.getTickets(
+      user.id,
+      { status: 'OPEN' },
+      { messages: { take: 1 }, tag: true },
+    );
+
     const pagination = new Pagination({
       data: tickets,
       format: (
-        { created_at, id, messages },
+        { created_at, id, messages, tag },
         index,
       ) => `*${index + 1}\\. Тикет от ${escapeMarkdown(created_at.toLocaleString())}*
 \`${escapeMarkdown(id)}\`
->${escapeMarkdown(messages[messages.length - 1]?.text || '')}`,
+>${escapeMarkdown(messages[messages.length - 1]?.text || '')}
+\`${escapeMarkdown(tag.value)}\``,
       onSelect: async ({ id, created_at }) => {
         ctx.session.current_ticket_id = id;
         await ctx.replyWithMarkdownV2(
-          escapeMarkdown(`Выбран токен! 
-*Токен от ${created_at.toLocaleString()}:* \`${id}\``),
+          escapeMarkdown(`Выбран тикет! 
+*Тикет от ${created_at.toLocaleString()}:* \`${id}\``),
         );
       },
       rowSize: 5,
@@ -132,7 +160,7 @@ export class SupportUpdate {
       return;
     }
 
-    const ticket = await this.ticketService.getTicket(ticket_id, undefined, 'OPEN');
+    const ticket = await this.ticketService.getTicket(ticket_id, { tag: true }, 'OPEN');
     if (!ticket) {
       await ctx.reply(`Такого тикета не существует! Проверьте на правильность введенную команду`);
       return;
@@ -140,9 +168,10 @@ export class SupportUpdate {
 
     ctx.session.current_ticket_id = ticket_id;
     await ctx.replyWithMarkdownV2(
-      escapeMarkdown(`Выбран токен! 
-*Токен от ${ticket.created_at.toLocaleString()}:* 
-\`${ticket.id}\``),
+      escapeMarkdown(`Выбран тикет! 
+*Тикет от ${ticket.created_at.toLocaleString()}:* 
+\`${ticket.id}\`
+\`${escapeMarkdown(ticket.tag.value)}\``),
     );
   }
 
@@ -233,7 +262,7 @@ export class SupportUpdate {
       await ctx.reply('Введите какой-нибудь текст в сообщение!');
       return;
     }
-    const ticket = await this.ticketService.getTicket(current_ticket_id, undefined, 'OPEN');
+    const ticket = await this.ticketService.getTicket(current_ticket_id, { tag: true }, 'OPEN');
     const { id } = await this.messageService.createMessage({
       sended: false,
       text: messageText,
@@ -245,7 +274,8 @@ export class SupportUpdate {
       `Сообщение отправлено на
 *Тикет от ${escapeMarkdown(ticket.created_at.toLocaleString())}:*
 \`${escapeMarkdown(ticket.id)}\`
-\>${escapeMarkdown(messageText)}`,
+\>${escapeMarkdown(messageText)}
+\`${escapeMarkdown(ticket.tag.value)}\``,
       {
         reply_markup: { inline_keyboard: [[{ callback_data: 'delete_message_' + id, text: 'Удалить это сообщение' }]] },
       },

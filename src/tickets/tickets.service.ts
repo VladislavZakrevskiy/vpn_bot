@@ -28,10 +28,17 @@ export class TicketService {
     });
   }
 
+  async getAllTickets(where?: Prisma.TicketWhereInput, include?: Prisma.TicketInclude) {
+    return await this.prisma.ticket.findMany({ where, include });
+  }
+
   async getTickets(user_id: string, where?: Prisma.TicketWhereInput, include?: Prisma.TicketInclude) {
     const user = await this.prisma.user.findUnique({
       where: { id: user_id },
-      include: { support_tickets: { where, include }, user_tickets: { where, include } },
+      include: {
+        support_tickets: { where, include, orderBy: { updated_at: 'desc' } },
+        user_tickets: { where, include, orderBy: { updated_at: 'desc' } },
+      },
     });
 
     return user.role === Role.SUPPORT ? user.support_tickets : user.user_tickets;

@@ -1,4 +1,4 @@
-import { Command, Ctx, InjectBot, Update } from 'nestjs-telegraf';
+import { Action, Command, Ctx, InjectBot, On, Update } from 'nestjs-telegraf';
 import { SessionSceneContext } from 'src/bots/bot/core/types/Context';
 import { MessageService } from 'src/messages/messages.service';
 import { TicketService } from 'src/tickets/tickets.service';
@@ -7,6 +7,7 @@ import { Pagination } from '@vladislav_zakrevskiy/telegraf-pagination';
 import { Telegraf } from 'telegraf';
 import { escapeMarkdown } from 'src/bots/bot/core/helpers/escapeMarkdown';
 import { PrismaService } from 'src/db/prisma.service';
+import { CallbackQuery } from 'telegraf/typings/core/types/typegram';
 
 @Update()
 export class SupportUpdate {
@@ -17,6 +18,46 @@ export class SupportUpdate {
     private prisma: PrismaService,
     @InjectBot('support') private bot: Telegraf,
   ) {}
+
+  @Action(/^choose_ticket_(.+)$/)
+  async choose_ticket(@Ctx() ctx: SessionSceneContext) {
+    const ticket_id = (ctx.callbackQuery as CallbackQuery & { data: string }).data.split('_')[2];
+
+    if (!ticket_id) {
+      await ctx.reply(`Введите айди желаемого для выбора тикета!`);
+      return;
+    }
+
+    const ticket = await this.ticketService.getTicket(ticket_id, undefined, 'OPEN');
+    if (!ticket) {
+      await ctx.reply(`Такого тикета не существует! Проверьте на правильность введенную команду`);
+      return;
+    }
+
+    ctx.session.current_ticket_id = ticket_id;
+    await ctx.replyWithMarkdownV2(
+      escapeMarkdown(`Выбран токен! 
+*Токен от ${ticket.created_at.toLocaleString()}:* 
+\`${ticket.id}\``),
+    );
+  }
+
+  @Action(/^delete_message_(.+)$/)
+  async deleteMessage(@Ctx() ctx: SessionSceneContext) {
+    const id = (ctx.callbackQuery as CallbackQuery & { data: string }).data.split('_')[2];
+
+    try {
+      const message = await this.messageService.getMessageByQuery({ id }, { ticket: { include: { user: true } } });
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      await this.bot.telegram.deleteMessage(message.ticket.user.tg_id, Number(message.message_id));
+      await ctx.replyWithMarkdownV2(`Сообщение удалено
+>${escapeMarkdown(message.text)}`);
+    } catch (e) {
+      await ctx.replyWithMarkdownV2('Произошла ошибка удаления, попробуйте снова через минуту');
+      console.log(e);
+    }
+  }
 
   @Command('my_ticket')
   async sendTicket(@Ctx() ctx: SessionSceneContext) {
@@ -38,41 +79,6 @@ export class SupportUpdate {
     await ctx.replyWithMarkdownV2(`*Тикет от ${escapeMarkdown(created_at.toLocaleString())}*
 \`${escapeMarkdown(id)}\`
 >${escapeMarkdown(messages[messages.length - 1]?.text || '')}`);
-  }
-
-  @Command('message')
-  async sendMessage(@Ctx() ctx: SessionSceneContext) {
-    const user = await this.userService.getUserByQuery({ tg_id: ctx.from.id.toString() });
-    if (user.role !== 'SUPPORT') {
-      return;
-    }
-
-    const text = ctx.text.split(' ');
-    text.splice(0, 1);
-    const messageText = text.join(' ');
-    const current_ticket_id = ctx.session.current_ticket_id;
-
-    if (!current_ticket_id) {
-      await ctx.reply('Не выбран тикет! Сначала выберите, потом пишите сообщение');
-      return;
-    }
-
-    if (!messageText) {
-      await ctx.reply('Введите какой-нибудь текст в сообщение!');
-      return;
-    }
-    const ticket = await this.ticketService.getTicket(current_ticket_id, undefined, 'OPEN');
-    await this.messageService.createMessage({
-      sended: false,
-      text: messageText,
-      type: 'TEXT',
-      ticket: { connect: { id: current_ticket_id } },
-      user: { connect: { tg_id: ctx.from.id.toString() } },
-    });
-    await ctx.replyWithMarkdownV2(`Сообщение отправилено на
-*Тикет от ${escapeMarkdown(ticket.created_at.toLocaleString())}:*
-\`${escapeMarkdown(ticket.id)}\`
->${escapeMarkdown(messageText)}`);
   }
 
   @Command('tickets')
@@ -170,7 +176,7 @@ export class SupportUpdate {
       data: messages,
       onlyNavButtons: true,
       format: ({ text, user_id }) => `*${user_id === supporter_id ? 'Вы' : 'Пользователь'}*
->${escapeMarkdown(text)}`,
+      >${escapeMarkdown(text)}`,
       parse_mode: 'MarkdownV2',
       header: (currentPage, size, total) => `${currentPage}/${Math.ceil(total / size)}`,
       isEnabledDeleteButton: false,
@@ -206,5 +212,43 @@ export class SupportUpdate {
     });
     await ctx.reply(settings.tp_close_support_message);
     // 'Отправили пользователю запрос на закрытие тикета! Ожидайsте!'
+  }
+
+  @On('text')
+  async sendMessage(@Ctx() ctx: SessionSceneContext) {
+    const user = await this.userService.getUserByQuery({ tg_id: ctx.from.id.toString() });
+    if (user.role !== 'SUPPORT') {
+      return;
+    }
+
+    const messageText = ctx.text;
+    const current_ticket_id = ctx.session.current_ticket_id;
+
+    if (!current_ticket_id) {
+      await ctx.reply('Не выбран тикет! Сначала выберите, потом пишите сообщение');
+      return;
+    }
+
+    if (!messageText) {
+      await ctx.reply('Введите какой-нибудь текст в сообщение!');
+      return;
+    }
+    const ticket = await this.ticketService.getTicket(current_ticket_id, undefined, 'OPEN');
+    const { id } = await this.messageService.createMessage({
+      sended: false,
+      text: messageText,
+      type: 'TEXT',
+      ticket: { connect: { id: current_ticket_id } },
+      user: { connect: { tg_id: ctx.from.id.toString() } },
+    });
+    await ctx.replyWithMarkdownV2(
+      `Сообщение отправлено на
+*Тикет от ${escapeMarkdown(ticket.created_at.toLocaleString())}:*
+\`${escapeMarkdown(ticket.id)}\`
+\>${escapeMarkdown(messageText)}`,
+      {
+        reply_markup: { inline_keyboard: [[{ callback_data: 'delete_message_' + id, text: 'Удалить это сообщение' }]] },
+      },
+    );
   }
 }

@@ -8,6 +8,7 @@ import { session } from 'telegraf';
 import { SupportBotModule } from './bots/support/support.module';
 import { BotModule } from './bots/bot/bot.module';
 import { TagsModule } from './tags/tags.module';
+import { SupportWorkModule } from './bots/support/support_work.module';
 
 @Module({
   imports: [
@@ -27,6 +28,15 @@ import { TagsModule } from './tags/tags.module';
       botName: 'main',
     }),
     BotModule,
+    // Support Work Bot
+    TelegrafModule.forRoot({
+      token: process.env.TELEGRAM_SUPPORT_WORK_BOT_TOKEN,
+      middlewares: [session()],
+      include: [SupportWorkModule],
+      botName: 'support_work',
+    }),
+    SupportWorkModule,
+    // Other
     HttpModule.register({
       baseURL: process.env.VPN_URL,
       global: true,

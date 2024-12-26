@@ -39,14 +39,14 @@ model Ticket {
   id           String    @id @default(uuid()) @db.Uuid
   status       Status
   created_at   DateTime  @default(now())
-  updated_at DateTime @default(now()) @updatedAt
+  updated_at   DateTime  @default(now()) @updatedAt
   messages     Message[]
   supporter_id String    @db.Uuid
   user_id      String    @db.Uuid
   supporter    User      @relation(fields: [supporter_id], references: [id], name: "support")
   user         User      @relation(fields: [user_id], references: [id], name: "user")
-  tag_id  String?  @db.Uuid 
-  tag         Tag? @relation(fields: [tag_id], references: [id])
+  tag_id       String?   @db.Uuid
+  tag          Tag?      @relation(fields: [tag_id], references: [id])
 }
 
 model Message {
@@ -55,6 +55,7 @@ model Message {
   type       MessageType
   created_at DateTime    @default(now())
   sended     Boolean
+  message_id String?
 
   user_id String @db.Uuid
   user    User   @relation(fields: [user_id], references: [id])

@@ -1,19 +1,27 @@
-import { Ctx, InjectBot, Start, Update } from 'nestjs-telegraf';
+import { Command, Ctx, Start, Update } from 'nestjs-telegraf';
 import { SessionSceneContext } from 'src/bots/bot/core/types/Context';
-import { UserService } from '../../../users/user/users.service';
+import { UserService } from 'src/users/user/users.service';
 import { VpnAdminService } from 'src/vpn/services/vpn.admin.service';
+import { getSupportText } from './texts/getSupportText';
 import { Role } from '@prisma/client';
-import { Telegraf } from 'telegraf';
-import { PrismaService } from 'src/db/prisma.service';
+import { getHelpText } from './texts/getHelpText';
 
 @Update()
-export class SupportBotUpdate {
+export class SupportWorkBot {
   constructor(
     private userService: UserService,
     private vpnAdminService: VpnAdminService,
-    @InjectBot('support') private readonly bot: Telegraf,
-    private prisma: PrismaService,
   ) {}
+
+  @Command('help')
+  async help(@Ctx() ctx: SessionSceneContext) {
+    const user = await this.userService.getUserByQuery({ tg_id: ctx.from.id.toString() });
+    if (user.role !== 'SUPPORT') {
+      return;
+    }
+
+    await ctx.replyWithHTML(getHelpText());
+  }
 
   @Start()
   async start(@Ctx() ctx: SessionSceneContext) {
@@ -36,13 +44,9 @@ export class SupportBotUpdate {
       });
     }
 
-    const settings = await this.prisma.settings.findFirst({});
-
     switch (user.role) {
-      case Role.USER:
-      case Role.ADMIN:
-        await ctx.replyWithMarkdownV2(settings.tp_hello_message);
-        // Здравствуйте, какая у вас возникла проблема?
+      case Role.SUPPORT:
+        await ctx.replyWithMarkdownV2(getSupportText());
         break;
     }
   }

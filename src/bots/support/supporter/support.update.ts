@@ -58,7 +58,7 @@ export class SupportUpdate {
       escapeMarkdown(`Выбран тикет! 
 *Тикет от ${ticket.created_at.toLocaleString()}:* 
 \`${ticket.id}\`
-\`${escapeMarkdown(ticket.tag.value)}\``),
+\`${escapeMarkdown(ticket.tag?.value || 'Нет тега')}\``),
     );
   }
 
@@ -100,7 +100,7 @@ export class SupportUpdate {
     await ctx.replyWithMarkdownV2(`*Тикет от ${escapeMarkdown(created_at.toLocaleString())}*
 \`${escapeMarkdown(id)}\`
 >${escapeMarkdown(messages[messages.length - 1]?.text || '')}
-\`${escapeMarkdown(tag.value)}\``);
+\`${escapeMarkdown(tag?.value || 'Нет тега')}\``);
   }
 
   @Command('tickets')
@@ -124,7 +124,7 @@ export class SupportUpdate {
       ) => `*${index + 1}\\. Тикет от ${escapeMarkdown(created_at.toLocaleString())}*
 \`${escapeMarkdown(id)}\`
 >${escapeMarkdown(messages[messages.length - 1]?.text || '')}
-\`${escapeMarkdown(tag.value)}\``,
+\`${escapeMarkdown(tag?.value || 'Нет тега')}\``,
       onSelect: async ({ id, created_at }) => {
         ctx.session.current_ticket_id = id;
         await ctx.replyWithMarkdownV2(
@@ -171,7 +171,7 @@ export class SupportUpdate {
       escapeMarkdown(`Выбран тикет! 
 *Тикет от ${ticket.created_at.toLocaleString()}:* 
 \`${ticket.id}\`
-\`${escapeMarkdown(ticket.tag.value)}\``),
+\`${escapeMarkdown(ticket.tag?.value || 'Нет тега')}\``),
     );
   }
 
@@ -275,7 +275,7 @@ export class SupportUpdate {
 *Тикет от ${escapeMarkdown(ticket.created_at.toLocaleString())}:*
 \`${escapeMarkdown(ticket.id)}\`
 \>${escapeMarkdown(messageText)}
-\`${escapeMarkdown(ticket.tag.value)}\``,
+\`${escapeMarkdown(ticket.tag?.value || 'Нет тега')}\``,
       {
         reply_markup: { inline_keyboard: [[{ callback_data: 'delete_message_' + id, text: 'Удалить это сообщение' }]] },
       },

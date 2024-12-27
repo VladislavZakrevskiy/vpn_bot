@@ -51,7 +51,7 @@ export class MessageCheckService {
               if (keyboard.length < 2) {
                 keyboard.push([{ callback_data: `tag_${message.ticket_id}_${tag.id}`, text: tag.value }]);
               } else {
-                if (keyboard[keyboard.length - 1].length >= 5) {
+                if (keyboard[keyboard.length - 1].length >= 3) {
                   keyboard.push([{ callback_data: `tag_${message.ticket_id}_${tag.id}`, text: tag.value }]);
                 } else {
                   keyboard[keyboard.length - 1].push({
@@ -96,7 +96,10 @@ export class MessageCheckService {
         try {
           const { message_id } = await this.bot.telegram.sendMessage(sender_id.id, escapeMarkdown(`${message.text}`), {
             reply_markup: {
-              inline_keyboard: [[{ callback_data: 'close_ticket_' + message.ticket_id, text: 'Вопрос решен ✅' }]],
+              inline_keyboard: [
+                [{ callback_data: 'close_ticket_' + message.ticket_id, text: 'Вопрос решен ✅' }],
+                [{ callback_data: 'close_ticket_fail_' + message.ticket_id, text: 'Вопрос не решен ❌' }],
+              ],
             },
           });
           current_message_id = message_id.toString();

@@ -18,26 +18,6 @@ export class UserUpdate {
     @InjectBot('support_work') private readonly workBot: Telegraf,
   ) {}
 
-  @Action(/^close_ticket_(.+)$/)
-  async close_ticket(@Ctx() ctx: SessionSceneContext) {
-    const ticket_id = (ctx.callbackQuery as CallbackQuery & { data: string }).data.split('_')[2];
-    const ticket = await this.ticketService.closeTicket(ticket_id);
-
-    await this.workBot.telegram.sendMessage(
-      ticket.supporter.tg_id,
-      `Пользователь \`${ticket.user.name}\` закрыл тикет\\! ✅
-*Тикет от ${escapeMarkdown(ticket.created_at.toLocaleString())}:*
-\`${escapeMarkdown(ticket.id)}\`
->${escapeMarkdown(ticket.messages[ticket.messages.length - 1].text)}
-\`${escapeMarkdown(ticket.tag?.value || 'Нет тега')}\``,
-      { parse_mode: 'MarkdownV2' },
-    );
-    await ctx.reply('Закрыли проблему! Если снова возникнут трудности, обращайтесь!');
-
-    const lastCloseMessage = ticket.messages.findLast(({ type }) => type === 'CLOSE');
-    await this.bot.telegram.deleteMessage(ticket.user_id, Number(lastCloseMessage.message_id));
-  }
-
   @Action(/^close_ticket_fail_(.+)$/)
   async close_fail_ticket(@Ctx() ctx: SessionSceneContext) {
     const ticket_id = (ctx.callbackQuery as CallbackQuery & { data: string }).data.split('_')[3];
@@ -53,6 +33,26 @@ export class UserUpdate {
       { parse_mode: 'MarkdownV2' },
     );
     await ctx.reply('Продолжаем разбираться\\!');
+
+    const lastCloseMessage = ticket.messages.findLast(({ type }) => type === 'CLOSE');
+    await this.bot.telegram.deleteMessage(ticket.user_id, Number(lastCloseMessage.message_id));
+  }
+
+  @Action(/^close_ticket_(.+)$/)
+  async close_ticket(@Ctx() ctx: SessionSceneContext) {
+    const ticket_id = (ctx.callbackQuery as CallbackQuery & { data: string }).data.split('_')[2];
+    const ticket = await this.ticketService.closeTicket(ticket_id);
+
+    await this.workBot.telegram.sendMessage(
+      ticket.supporter.tg_id,
+      `Пользователь \`${ticket.user.name}\` закрыл тикет\\! ✅
+*Тикет от ${escapeMarkdown(ticket.created_at.toLocaleString())}:*
+\`${escapeMarkdown(ticket.id)}\`
+>${escapeMarkdown(ticket.messages[ticket.messages.length - 1].text)}
+\`${escapeMarkdown(ticket.tag?.value || 'Нет тега')}\``,
+      { parse_mode: 'MarkdownV2' },
+    );
+    await ctx.reply('Закрыли проблему! Если снова возникнут трудности, обращайтесь!');
 
     const lastCloseMessage = ticket.messages.findLast(({ type }) => type === 'CLOSE');
     await this.bot.telegram.deleteMessage(ticket.user_id, Number(lastCloseMessage.message_id));

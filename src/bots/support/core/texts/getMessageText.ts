@@ -9,7 +9,7 @@ export const getMessageText = (
     return `${`*Сообщение от пользователя \`${message?.user?.name}\`, номер тикета:*
 \`${message.ticket_id}\``}
 >${escapeMarkdown(message.text)}
-\`${escapeMarkdown(message.ticket.tag.value || 'Нет тега')}\``;
+\`${escapeMarkdown(message.ticket?.tag?.value || 'Нет тега')}\``;
   } else {
     return `${'*Сообщение от работника поддержки:*'}
 >${escapeMarkdown(message.text)}`;

@@ -60,7 +60,7 @@ export class UserUpdate {
     await ctx.reply('Закрыли проблему! Если снова возникнут трудности, обращайтесь!');
 
     const lastCloseMessage = ticket.messages.findLast(({ type }) => type === 'CLOSE');
-    await this.bot.telegram.deleteMessage(ticket.user_id, Number(lastCloseMessage.message_id));
+    await this.bot.telegram.deleteMessage(ticket.user.tg_id, Number(lastCloseMessage.message_id));
   }
 
   @On('text')

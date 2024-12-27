@@ -21,7 +21,12 @@ export class UserUpdate {
   @Action(/^close_ticket_fail_(.+)$/)
   async close_fail_ticket(@Ctx() ctx: SessionSceneContext) {
     const ticket_id = (ctx.callbackQuery as CallbackQuery & { data: string }).data.split('_')[3];
-    const ticket = await this.ticketService.getTicket(ticket_id, { messages: true, tag: true, user: true });
+    const ticket = await this.ticketService.getTicket(ticket_id, {
+      messages: true,
+      tag: true,
+      user: true,
+      supporter: true,
+    });
 
     await this.workBot.telegram.sendMessage(
       ticket.supporter.tg_id,

@@ -205,7 +205,7 @@ export class SupportUpdate {
       data: messages,
       onlyNavButtons: true,
       format: ({ text, user_id }) => `*${user_id === supporter_id ? 'Вы' : 'Пользователь'}*
-      >${escapeMarkdown(text)}`,
+\>${escapeMarkdown(text)}`,
       parse_mode: 'MarkdownV2',
       header: (currentPage, size, total) => `${currentPage}/${Math.ceil(total / size)}`,
       isEnabledDeleteButton: false,

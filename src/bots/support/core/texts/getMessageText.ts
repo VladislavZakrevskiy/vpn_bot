@@ -6,7 +6,7 @@ export const getMessageText = (
   type: 'user' | 'support',
 ) => {
   if (type === 'support') {
-    return `${`*Сообщение от пользователя \`${message.user.name}\`, номер тикета:*
+    return `${`*Сообщение от пользователя \`${message?.user?.name}\`, номер тикета:*
 \`${message.ticket_id}\``}
 >${escapeMarkdown(message.text)}
 \`${escapeMarkdown(message.ticket.tag.value || 'Нет тега')}\``;

@@ -24,7 +24,7 @@ export class MessageCheckService {
   async sendMessages() {
     const messages = await this.messageService.getMessagesByQuery(
       { sended: false },
-      { ticket: { include: { supporter: true, user: true, tag: true } } },
+      { ticket: { include: { supporter: true, user: true, tag: true } }, user: true },
     );
 
     for (const message of messages) {

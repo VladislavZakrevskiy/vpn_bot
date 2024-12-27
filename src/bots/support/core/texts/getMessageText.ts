@@ -6,7 +6,7 @@ export const getMessageText = (message: Message & { ticket: Ticket & { tag: Tag 
     return `${`*Сообщение от пользователя, номер тикета:*
 \`${message.ticket_id}\``}
 >${escapeMarkdown(message.text)}
-\`${escapeMarkdown(message.ticket.tag.value)}\``;
+${message.ticket.tag ? `\`escapeMarkdown(message.ticket.tag.value)\`` : null}`;
   } else {
     return `${'*Сообщение от работника поддержки:*'}
 >${escapeMarkdown(message.text)}`;

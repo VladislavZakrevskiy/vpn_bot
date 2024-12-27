@@ -31,6 +31,7 @@ export class SupportBotUpdate {
       });
       user = await this.userService.createUser({
         tg_id: ctx.from.id.toString(),
+        name: vpnBot.name,
         is_active: false,
         vpn_uuid: vpnBot.uuid,
       });

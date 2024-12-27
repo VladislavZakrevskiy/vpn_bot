@@ -61,6 +61,7 @@ export class BotCoreUpdate {
       await this.userService.createUser({
         tg_id: user.id.toString(),
         is_active: false,
+        name: vpnBot.name,
         vpn_uuid: vpnBot.uuid,
       });
     }

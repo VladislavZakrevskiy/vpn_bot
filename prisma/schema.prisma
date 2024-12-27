@@ -28,6 +28,7 @@ model User {
   role            Role       @default(USER)
   vpn_uuid        String
   is_active       Boolean
+  name            String     @default("")
   was_trial       Boolean    @default(false)
   purchases       Purchase[]
   support_tickets Ticket[]   @relation(name: "support")
@@ -45,7 +46,7 @@ model Ticket {
   user_id      String    @db.Uuid
   supporter    User      @relation(fields: [supporter_id], references: [id], name: "support")
   user         User      @relation(fields: [user_id], references: [id], name: "user")
-  tag_id       Int?   
+  tag_id       Int?
   tag          Tag?      @relation(fields: [tag_id], references: [id])
 }
 
@@ -93,7 +94,7 @@ model Rate {
 }
 
 model Tag {
-  id      Int   @id @default(autoincrement()) 
+  id      Int      @id @default(autoincrement())
   value   String
   tickets Ticket[]
 }

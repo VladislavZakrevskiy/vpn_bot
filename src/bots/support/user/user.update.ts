@@ -25,10 +25,11 @@ export class UserUpdate {
 
     await this.workBot.telegram.sendMessage(
       ticket.supporter.tg_id,
-      `Пользователь закрыл тикет\\! ✅
+      `Пользователь \`${ticket.user.name}\` закрыл тикет\\! ✅
 *Тикет от ${escapeMarkdown(ticket.created_at.toLocaleString())}:*
 \`${escapeMarkdown(ticket.id)}\`
->${escapeMarkdown(ticket.messages[ticket.messages.length - 1].text)}`,
+>${escapeMarkdown(ticket.messages[ticket.messages.length - 1].text)}
+\`${escapeMarkdown(ticket.tag?.value || 'Нет тега')}\``,
       { parse_mode: 'MarkdownV2' },
     );
     await ctx.reply('Закрыли проблему! Если снова возникнут трудности, обращайтесь!');
@@ -39,15 +40,16 @@ export class UserUpdate {
 
   @Action(/^close_ticket_fail_(.+)$/)
   async close_fail_ticket(@Ctx() ctx: SessionSceneContext) {
-    const ticket_id = (ctx.callbackQuery as CallbackQuery & { data: string }).data.split('_')[2];
-    const ticket = await this.ticketService.closeTicket(ticket_id);
+    const ticket_id = (ctx.callbackQuery as CallbackQuery & { data: string }).data.split('_')[3];
+    const ticket = await this.ticketService.getTicket(ticket_id, { messages: true, tag: true, user: true });
 
     await this.workBot.telegram.sendMessage(
       ticket.supporter.tg_id,
-      `Пользователь не закрыл тикет\\! ❌
+      `Пользователь \`${ticket.user.name}\` не закрыл тикет\\! ❌
 *Тикет от ${escapeMarkdown(ticket.created_at.toLocaleString())}:*
 \`${escapeMarkdown(ticket.id)}\`
->${escapeMarkdown(ticket.messages[ticket.messages.length - 1].text)}`,
+>${escapeMarkdown(ticket.messages[ticket.messages.length - 1].text)}
+\`${escapeMarkdown(ticket.tag?.value || 'Нет тега')}\``,
       { parse_mode: 'MarkdownV2' },
     );
     await ctx.reply('Продолжаем разбираться\\!');

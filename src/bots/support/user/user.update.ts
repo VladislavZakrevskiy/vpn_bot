@@ -22,7 +22,7 @@ export class UserUpdate {
   async close_fail_ticket(@Ctx() ctx: SessionSceneContext) {
     const ticket_id = (ctx.callbackQuery as CallbackQuery & { data: string }).data.split('_')[3];
     const ticket = await this.ticketService.getTicket(ticket_id, {
-      messages: true,
+      messages: { include: { user: true } },
       tag: true,
       user: true,
       supporter: true,
@@ -40,7 +40,7 @@ export class UserUpdate {
     await ctx.reply('Продолжаем разбираться\\!');
 
     const lastCloseMessage = ticket.messages.findLast(({ type }) => type === 'CLOSE');
-    await this.bot.telegram.deleteMessage(ticket.user_id, Number(lastCloseMessage.message_id));
+    await this.bot.telegram.deleteMessage(ticket.user.tg_id, Number(lastCloseMessage.message_id));
   }
 
   @Action(/^close_ticket_(.+)$/)

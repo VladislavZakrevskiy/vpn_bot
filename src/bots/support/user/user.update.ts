@@ -15,7 +15,7 @@ export class UserUpdate {
     private ticketService: TicketService,
     private messageService: MessageService,
     @InjectBot('support') private readonly bot: Telegraf,
-    @InjectBot('support_bot') private readonly workBot: Telegraf,
+    @InjectBot('support_work') private readonly workBot: Telegraf,
   ) {}
 
   @Action(/^close_ticket_(.+)$/)
